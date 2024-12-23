@@ -1,3 +1,3 @@
-import { GetListDetailRoute } from "@/modules/lists/routes/GetListDetailRoute";
+import { GetListDetailController } from "@/modules/lists/controllers/get-list-detail.controller";
 
-export const GET = GetListDetailRoute;
+export const GET = GetListDetailController;

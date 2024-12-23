@@ -1,5 +1,5 @@
-import { SaveListRoute } from "@/modules/lists/routes/SaveListRoute";
-import { DeleteSavedListRoute } from "@/modules/lists/routes/DeleteSavedListRoute";
+import { SaveListController } from "@/modules/lists/controllers/save-list.controller";
+import { DeleteSavedListController } from "@/modules/lists/controllers/delete-saved-list.controller";
 
-export const POST = SaveListRoute;
-export const DELETE = DeleteSavedListRoute;
+export const POST = SaveListController;
+export const DELETE = DeleteSavedListController;

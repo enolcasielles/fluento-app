@@ -1,3 +1,3 @@
-import { GetSavedListsRoute } from "@/modules/lists/routes/GetSavedListsRoute";
+import { GetSavedListsController } from "@/modules/lists/controllers/get-saved-lists.controller";
 
-export const GET = GetSavedListsRoute;
+export const GET = GetSavedListsController;

@@ -3,7 +3,7 @@ import { prisma } from "@/core/lib/prisma";
 export default async function Home() {
   const user = await prisma.user.findUnique({
     where: {
-      email: "enolcasielles@gmail.com",
+      email: "usuario1@ejemplo.com",
     },
   });
   return (

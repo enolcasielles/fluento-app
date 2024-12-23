@@ -1,5 +1,5 @@
-import { GetListsRoute } from "@/modules/lists/routes/GetListsRoute";
-import { CreateListRoute } from "@/modules/lists/routes/CreateListRoute";
+import { GetListsController } from "@/modules/lists/controllers/get-lists.controller";
+import { CreateListController } from "@/modules/lists/controllers/create-list.controller";
 
-export const GET = GetListsRoute;
-export const POST = CreateListRoute;
+export const GET = GetListsController;
+export const POST = CreateListController;

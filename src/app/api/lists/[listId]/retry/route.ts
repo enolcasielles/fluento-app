@@ -1,3 +1,3 @@
-import { RetryCreateListRoute } from "@/modules/lists/routes/RetryCreateListRoute";
+import { RetryCreateListRoute } from "@/modules/lists/services/RetryCreateListRoute";
 
 export const POST = RetryCreateListRoute;

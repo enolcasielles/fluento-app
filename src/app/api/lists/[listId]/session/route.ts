@@ -1,3 +1,3 @@
-import { GetListSessionRoute } from "@/modules/sessions/routes/GetListSessionRoute";
+import { GetListSessionController } from "@/modules/lists/controllers/get-list-session.controller";
 
-export const GET = GetListSessionRoute;
+export const GET = GetListSessionController;
