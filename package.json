@@ -2,13 +2,15 @@
   "name": "phrase-up",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 1100",
     "infra": "docker-compose -f infra/docker-compose.yaml up",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",
@@ -19,6 +21,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.417.0",
     "next": "14.2.5",
