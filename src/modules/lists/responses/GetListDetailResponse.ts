@@ -3,12 +3,13 @@ export interface GetListDetailResponse {
   name: string;
   description: string;
   imageUrl: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
+  difficulty: "ANY" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
   topic: string;
-  grammarStructures: string[];
+  grammarStructures: string;
   totalUnits: number;
   isSaved: boolean;
-  userProgress?: {
+  creationStatus: "IN_PROGRESS" | "COMPLETED" | "FAILED";
+  userProgress: {
     practicedUnits: number;
     passedUnits: number;
     averageScore: number;

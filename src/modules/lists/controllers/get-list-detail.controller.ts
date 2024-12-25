@@ -1,12 +1,16 @@
-import { NextApiRequest } from "next";
 import { CustomError } from "@/core/errors";
 import { apiError } from "@/core/api-responses/api-error";
 import { getListDetailService } from "../services/get-list-detail.service";
+import { Role } from "@/core/enums/role.enum";
+import { authenticate } from "@/core/lib/auth";
 
-export async function GetListDetailController(request: NextApiRequest) {
+export async function GetListDetailController(
+  request: Request,
+  { params }: { params: { listId: string } },
+) {
   try {
-    const { listId } = request.query;
-    const response = await getListDetailService({ listId: listId.toString() });
+    const userId = await authenticate(request, Role.USER);
+    const response = await getListDetailService(params.listId, userId);
     return Response.json(response);
   } catch (error) {
     if (error instanceof CustomError) {
@@ -15,7 +19,7 @@ export async function GetListDetailController(request: NextApiRequest) {
     return apiError(
       new CustomError({
         message:
-          "Se ha producido un error inesperado al obtener los detalles de la lista",
+          "Se ha producido un error inesperado al obtener el detalle de la lista",
       }),
     );
   }

@@ -1,23 +1,87 @@
+import { prisma } from "@/core/lib/prisma";
 import { GetListDetailResponse } from "../responses/GetListDetailResponse";
+import { CustomError } from "@/core/errors";
 
-interface Props {
-  listId: string;
-}
+export async function getListDetailService(
+  listId: string,
+  userId: string,
+): Promise<GetListDetailResponse> {
+  const list = await prisma.list.findUnique({
+    where: {
+      id: listId,
+    },
+  });
 
-export async function getListDetailService({
-  listId,
-}: Props): Promise<GetListDetailResponse> {
-  // TODO: Implementar obtención de detalles de lista
-  console.log(listId);
+  const session = await prisma.session.findFirst({
+    where: {
+      listId,
+      userId,
+    },
+    include: {
+      results: {
+        include: {
+          unit: true,
+        },
+      },
+    },
+  });
+
+  const savedList = await prisma.list.findFirst({
+    where: {
+      id: listId,
+      savedBy: {
+        some: {
+          id: userId,
+        },
+      },
+    },
+  });
+
+  const bestResults = session?.results.reduce(
+    (acc, result) => {
+      if (!acc[result.unit.id] || acc[result.unit.id].score < result.score) {
+        acc[result.unit.id] = result;
+      }
+      return acc;
+    },
+    {} as Record<string, (typeof session.results)[0]>,
+  );
+
+  const uniqueBestResults = bestResults ? Object.values(bestResults) : [];
+
+  const userProgress = {
+    practicedUnits: uniqueBestResults.length,
+    passedUnits: uniqueBestResults.filter((result) => result.score >= 3).length,
+    averageScore:
+      uniqueBestResults.reduce((acc, result) => acc + result.score, 0) /
+      uniqueBestResults.length,
+  };
+
+  if (!list) {
+    throw new CustomError({
+      message: "La lista no existe",
+      statusCode: 404,
+    });
+  }
+
+  if (!list.isPublic && list.creatorId !== userId) {
+    throw new CustomError({
+      message: "No tienes permiso para ver esta lista",
+      statusCode: 403,
+    });
+  }
+
   return {
-    id: listId,
-    name: "",
-    description: "",
-    imageUrl: "",
-    difficulty: "beginner",
-    topic: "",
-    grammarStructures: [],
-    totalUnits: 0,
-    isSaved: false,
+    id: list.id,
+    name: list.name,
+    description: list.description || "",
+    imageUrl: list.imageUrl || "",
+    difficulty: list.difficulty,
+    topic: list.topic,
+    grammarStructures: list.grammarStructures,
+    totalUnits: list.totalUnits,
+    isSaved: savedList ? true : false,
+    creationStatus: list.creationStatus,
+    userProgress,
   };
 }
