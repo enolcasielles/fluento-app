@@ -4,7 +4,7 @@ export interface GetSavedListsResponse {
     name: string;
     description: string;
     imageUrl: string;
-    difficulty: "beginner" | "intermediate" | "advanced";
+    difficulty: "ANY" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
     totalUnits: number;
   }[];
 }
