@@ -1,3 +1,3 @@
-import { GetExploreRoute } from "@/modules/explore/routes/GetExploreRoute";
+import { GetExploreController } from "@/modules/explore/controllers/get-explore.controller";
 
-export const GET = GetExploreRoute;
+export const GET = GetExploreController;

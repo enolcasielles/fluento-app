@@ -1,16 +1,17 @@
 import jwt from "jsonwebtoken";
+import { Role } from "../enums/role.enum";
 
-const SECRET_KEY = process.env.JWT_SECRET_KEY;
+const SECRET_KEY = process.env.SUPABASE_KEY;
 
 interface TokenPayload {
-  challengeId: string;
+  sub: string;
+  exp: number;
 }
 
 export function verifyToken(token: string): TokenPayload {
   return jwt.verify(token, SECRET_KEY) as TokenPayload;
 }
 
-export function generateToken(challengeId: string): string {
-  const payload: TokenPayload = { challengeId };
-  return jwt.sign(payload, SECRET_KEY);
+export function decodeToken(token: string): TokenPayload {
+  return jwt.decode(token) as TokenPayload;
 }
