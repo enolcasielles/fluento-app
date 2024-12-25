@@ -1,5 +1,5 @@
-import { GetListsController } from "@/modules/lists/controllers/get-lists.controller";
 import { CreateListController } from "@/modules/lists/controllers/create-list.controller";
+import { GetMyListsController } from "@/modules/lists/controllers/get-my-lists.controller";
 
-export const GET = GetListsController;
+export const GET = GetMyListsController;
 export const POST = CreateListController;

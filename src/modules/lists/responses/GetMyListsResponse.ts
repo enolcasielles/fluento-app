@@ -1,15 +1,11 @@
-export interface GetListsResponse {
+export interface GetMyListsResponse {
   lists: {
     id: string;
     name: string;
     description: string;
     imageUrl: string;
-    difficulty: "beginner" | "intermediate" | "advanced";
+    difficulty: "ANY" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
     totalUnits: number;
     creationStatus: "IN_PROGRESS" | "COMPLETED" | "FAILED";
-    progress: {
-      completedUnits: number;
-      averageScore: number;
-    };
   }[];
 }
