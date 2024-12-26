@@ -1,12 +1,16 @@
-import { NextApiRequest } from "next";
 import { CustomError } from "@/core/errors";
 import { apiError } from "@/core/api-responses/api-error";
 import { getListSessionService } from "../services/get-list-session.service";
+import { Role } from "@/core/enums/role.enum";
+import { authenticate } from "@/core/lib/auth";
 
-export async function GetListSessionController(request: NextApiRequest) {
+export async function GetListSessionController(
+  request: Request,
+  { params }: { params: { listId: string } },
+) {
   try {
-    const { listId } = request.query;
-    const response = await getListSessionService({ listId: listId.toString() });
+    const userId = await authenticate(request, Role.USER);
+    const response = await getListSessionService(params.listId, userId);
     return Response.json(response);
   } catch (error) {
     if (error instanceof CustomError) {

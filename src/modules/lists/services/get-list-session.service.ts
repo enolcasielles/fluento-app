@@ -1,29 +1,64 @@
-import { GetListSessionResponse } from "@/modules/sessions/responses/GetListSessionResponse";
+import { prisma } from "@/core/lib/prisma";
+import { GetListSessionResponse } from "../responses/GetListSessionResponse";
+import { CustomError } from "@/core/errors";
+import { generateNextUnit } from "@/core/engine/generate-next-unit";
 
-interface Props {
-  listId: string;
-}
+export async function getListSessionService(
+  listId: string,
+  userId: string,
+): Promise<GetListSessionResponse> {
+  const list = await prisma.list.findUnique({
+    where: { id: listId },
+  });
 
-export async function getListSessionService({
-  listId,
-}: Props): Promise<GetListSessionResponse> {
-  // TODO: Implementar obtención de sesión de lista
-  console.log(listId);
+  if (!list) {
+    throw new CustomError({
+      message: "La lista no existe",
+      statusCode: 404,
+    });
+  }
+
+  if (!list.isPublic && list.creatorId !== userId) {
+    throw new CustomError({
+      message: "No tienes permiso para acceder a esta lista",
+      statusCode: 403,
+    });
+  }
+
+  // Buscar una sesión existente o crear una nueva
+  let session = await prisma.session.findFirst({
+    where: {
+      listId,
+      userId,
+    },
+  });
+
+  if (!session) {
+    session = await prisma.session.create({
+      data: {
+        listId,
+        userId,
+      },
+    });
+  }
+
+  const nextUnit = await generateNextUnit(session.id);
+
   return {
-    sessionId: "",
-    listId: listId,
-    listName: "",
+    sessionId: session.id,
+    listId: list.id,
+    listName: list.name,
     nextUnit: {
-      id: "",
-      question: {
-        text: "",
-        audio: "",
-      },
+      id: nextUnit.id,
       answer: {
-        text: "",
-        audio: "",
+        text: nextUnit.answerText,
+        audio: nextUnit.answerAudio,
       },
-      responseTime: 0,
+      question: {
+        text: nextUnit.questionText,
+        audio: nextUnit.questionAudio,
+      },
+      responseTime: nextUnit.responseTime,
     },
   };
 }
