@@ -1,3 +1,3 @@
-import { GetUserRoute } from "@/modules/user/routes/GetUserRoute";
+import { GetUserController } from "@/modules/user/controllers/get-user.controller";
 
-export const GET = GetUserRoute;
+export const GET = GetUserController;

@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
+import { GetUserController } from "../controllers/get-user.controller";
 
-export async function GetUserRoute() {
-  // TODO: Implementar obtención de información del usuario
-  return NextResponse.json({ message: "Not implemented" });
+export async function GetUserRoute(request: Request) {
+  return GetUserController(request);
 }
