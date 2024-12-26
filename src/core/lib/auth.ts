@@ -28,7 +28,7 @@ export const authenticate = async (
         statusCode: 403,
       });
     }
-    return payload.sub;
+    return user.id;
   } catch (error) {
     if (error instanceof CustomError) throw error;
     throw new CustomError({

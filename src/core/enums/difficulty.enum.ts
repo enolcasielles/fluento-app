@@ -1,0 +1,6 @@
+export enum Difficulty {
+  ANY = "ANY",
+  BEGINNER = "BEGINNER",
+  INTERMEDIATE = "INTERMEDIATE",
+  ADVANCED = "ADVANCED",
+}

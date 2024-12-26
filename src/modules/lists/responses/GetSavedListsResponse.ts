@@ -1,10 +1,12 @@
+import { Difficulty } from "@/core/enums/difficulty.enum";
+
 export interface GetSavedListsResponse {
   lists: {
     id: string;
     name: string;
     description: string;
     imageUrl: string;
-    difficulty: "ANY" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+    difficulty: Difficulty;
     totalUnits: number;
   }[];
 }

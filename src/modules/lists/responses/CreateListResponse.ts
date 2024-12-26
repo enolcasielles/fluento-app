@@ -1,9 +1,11 @@
+import { CreationStatus } from "@/core/enums/creation-status.enum";
+import { Difficulty } from "@/core/enums/difficulty.enum";
+
 export interface CreateListResponse {
   id: string;
   name: string;
   topic: string;
-  imageUrl: string;
-  difficulty: string;
   grammarStructures: string;
-  creationStatus: "IN_PROGRESS" | "COMPLETED" | "FAILED";
+  difficulty: Difficulty;
+  creationStatus: CreationStatus;
 }

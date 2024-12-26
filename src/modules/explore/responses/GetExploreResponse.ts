@@ -1,3 +1,5 @@
+import { Difficulty } from "@/core/enums/difficulty.enum";
+
 export interface GetExploreResponse {
   categories: {
     id: string;
@@ -7,7 +9,7 @@ export interface GetExploreResponse {
       name: string;
       description: string;
       imageUrl: string;
-      difficulty: "beginner" | "intermediate" | "advanced";
+      difficulty: Difficulty;
       totalUnits: number;
     }[];
   }[];
