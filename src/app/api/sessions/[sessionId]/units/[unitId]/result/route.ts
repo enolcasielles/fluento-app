@@ -1,3 +1,3 @@
-import { SubmitResultRoute } from "@/modules/sessions/routes/SubmitResultRoute";
+import { SubmitResultController } from "@/modules/sessions/controllers/submit-result.controller";
 
-export const POST = SubmitResultRoute;
+export const POST = SubmitResultController;
