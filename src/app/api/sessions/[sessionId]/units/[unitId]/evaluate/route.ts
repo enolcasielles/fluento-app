@@ -1,3 +1,3 @@
-import { EvaluateAnswerRoute } from "@/modules/sessions/routes/EvaluateAnswerRoute";
+import { EvaluateAnswerController } from "@/modules/sessions/controllers/evaluate-answer.controller";
 
-export const POST = EvaluateAnswerRoute;
+export const POST = EvaluateAnswerController;
