@@ -1,9 +1,5 @@
-import { OpenAI } from "openai";
 import { CustomError } from "../errors";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from "../lib/openai";
 
 export async function audioToText(audio: File): Promise<string> {
   try {
