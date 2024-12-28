@@ -1,4 +1,7 @@
+import { apiError } from "@/core/api-responses/api-error";
+import { apiSuccess } from "@/core/api-responses/api-success";
 import { evaluateAnswer } from "@/core/engine/evaluate-answer";
+import { CustomError } from "@/core/errors";
 
 const testCases = [
   {
@@ -85,6 +88,13 @@ const testCases = [
 
 export async function POST() {
   try {
+    if (process.env.NODE_ENV !== "development") {
+      throw new CustomError({
+        message: "Esta ruta solo está disponible en el entorno de desarrollo",
+        type: "ValidationError",
+        statusCode: 403,
+      });
+    }
     const results = await Promise.all(
       testCases.map(async (testCase) => {
         const score = await evaluateAnswer(
@@ -98,11 +108,15 @@ export async function POST() {
       }),
     );
 
-    return Response.json({ results });
+    return apiSuccess({ results });
   } catch (error) {
-    return Response.json(
-      { error: "Error al procesar las evaluaciones" },
-      { status: 500 },
+    if (error instanceof CustomError) {
+      return apiError(error);
+    }
+    return apiError(
+      new CustomError({
+        message: "Se ha producido un error al procesar las evaluaciones",
+      }),
     );
   }
 }

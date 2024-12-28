@@ -67,9 +67,9 @@ model List {
 model Unit {
   id           String   @id @default(uuid())
   questionText String
-  questionAudio String
+  questionAudio String?
   answerText   String
-  answerAudio  String
+  answerAudio  String?
   responseTime Int      // en milisegundos
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -115,6 +115,7 @@ enum Difficulty {
 }
 
 enum CreationStatus {
+  PENDING
   IN_PROGRESS
   COMPLETED
   FAILED

@@ -7,6 +7,7 @@ import {
 } from "../requests/CreateListRequest";
 import { authenticate } from "@/core/lib/auth";
 import { Role } from "@/core/enums/role.enum";
+import { apiSuccess } from "@/core/api-responses/api-success";
 
 export async function CreateListController(request: Request) {
   try {
@@ -14,7 +15,7 @@ export async function CreateListController(request: Request) {
     const body = await request.json();
     validateCreateListRequest(body);
     const response = await createListService(userId, body as CreateListRequest);
-    return Response.json(response);
+    return apiSuccess(response);
   } catch (error) {
     console.error(error);
     if (error instanceof CustomError) {

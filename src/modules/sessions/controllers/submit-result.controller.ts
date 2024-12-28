@@ -7,6 +7,7 @@ import {
   SubmitResultRequest,
   validateSubmitResultRequest,
 } from "../requests/SubmitResultRequest";
+import { apiSuccess } from "@/core/api-responses/api-success";
 
 export async function SubmitResultController(
   request: Request,
@@ -25,7 +26,7 @@ export async function SubmitResultController(
       body as SubmitResultRequest,
     );
 
-    return Response.json(response);
+    return apiSuccess(response);
   } catch (error) {
     if (error instanceof CustomError) {
       return apiError(error);

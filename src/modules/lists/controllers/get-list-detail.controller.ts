@@ -3,6 +3,7 @@ import { apiError } from "@/core/api-responses/api-error";
 import { getListDetailService } from "../services/get-list-detail.service";
 import { Role } from "@/core/enums/role.enum";
 import { authenticate } from "@/core/lib/auth";
+import { apiSuccess } from "@/core/api-responses/api-success";
 
 export async function GetListDetailController(
   request: Request,
@@ -11,7 +12,7 @@ export async function GetListDetailController(
   try {
     const userId = await authenticate(request, Role.USER);
     const response = await getListDetailService(params.listId, userId);
-    return Response.json(response);
+    return apiSuccess(response);
   } catch (error) {
     if (error instanceof CustomError) {
       return apiError(error);

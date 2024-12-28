@@ -1,6 +1,8 @@
 import { prisma } from "@/core/lib/prisma";
 import { GetListDetailResponse } from "../responses/GetListDetailResponse";
 import { CustomError } from "@/core/errors";
+import { CreationStatus } from "@/core/enums/creation-status.enum";
+import { Difficulty } from "@/core/enums/difficulty.enum";
 
 export async function getListDetailService(
   listId: string,
@@ -76,12 +78,12 @@ export async function getListDetailService(
     name: list.name,
     description: list.description || "",
     imageUrl: list.imageUrl || "",
-    difficulty: list.difficulty,
+    difficulty: list.difficulty as Difficulty,
     topic: list.topic,
     grammarStructures: list.grammarStructures,
     totalUnits: list.totalUnits,
     isSaved: savedList ? true : false,
-    creationStatus: list.creationStatus,
+    creationStatus: list.creationStatus as CreationStatus,
     userProgress,
   };
 }
