@@ -5,15 +5,15 @@ volumes:
 
 services:
   postgres:
-    container_name: phrase-up-postgres
+    container_name: fluento-postgres
     image: postgres:16.3-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: phrase-up-local
+      POSTGRES_DB: fluento-local
     ports:
       - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
-      - ./postgres_config:/docker-entrypoint-initdb.d
+      - ./postgres_config:/docker-entrypoint-initdb.d 
