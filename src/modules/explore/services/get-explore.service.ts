@@ -1,5 +1,6 @@
 import { prisma } from "@/core/lib/prisma";
 import { GetExploreResponse } from "../responses/GetExploreResponse";
+import { Difficulty } from "@/core/enums/difficulty.enum";
 
 export async function getExploreService(): Promise<GetExploreResponse> {
   const categories = await prisma.category.findMany({
@@ -30,10 +31,7 @@ export async function getExploreService(): Promise<GetExploreResponse> {
         name: list.name,
         description: list.description || "",
         imageUrl: list.imageUrl || "",
-        difficulty: list.difficulty.toLowerCase() as
-          | "beginner"
-          | "intermediate"
-          | "advanced",
+        difficulty: list.difficulty as Difficulty,
         totalUnits: list.totalUnits,
       })),
     })),

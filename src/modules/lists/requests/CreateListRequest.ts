@@ -18,9 +18,9 @@ export const createListRequestSchema = z.object({
     .min(1, "Las estructuras gramaticales son requeridas"),
 });
 
-export function validateCreateListRequest(data: unknown) {
+export function validateCreateListRequest(data: unknown): CreateListRequest {
   try {
-    createListRequestSchema.parse(data) as CreateListRequest;
+    return createListRequestSchema.parse(data) as CreateListRequest;
   } catch (error) {
     if (error instanceof ZodError) {
       throw ValidationError.fromZodError(error);

@@ -18,6 +18,7 @@ export async function createListService(
   if (!user.isPremium) {
     throw new CustomError({
       message: "Necesitas ser usuario Premium para crear listas",
+      type: "NEED_PREMIUM",
       statusCode: 403,
     });
   }
@@ -34,6 +35,7 @@ export async function createListService(
     },
   });
 
+  //TODO: Migrar a un job
   const updatedList = await generateListUnitsService(list.id, userId);
 
   return {

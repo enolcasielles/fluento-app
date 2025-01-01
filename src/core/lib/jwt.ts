@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { Role } from "../enums/role.enum";
 
 const SECRET_KEY = process.env.SUPABASE_KEY;
 

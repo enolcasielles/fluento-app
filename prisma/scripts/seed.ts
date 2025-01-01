@@ -25,6 +25,7 @@ async function main() {
   // Crear usuarios de ejemplo
   const user1 = await prisma.user.create({
     data: {
+      sub: "1234567890",
       email: "usuario1@ejemplo.com",
       name: "Usuario Ejemplo 1",
       isPremium: true,
@@ -33,6 +34,7 @@ async function main() {
 
   const user2 = await prisma.user.create({
     data: {
+      sub: "1234567891",
       email: "usuario2@ejemplo.com",
       name: "Usuario Ejemplo 2",
       isPremium: false,
