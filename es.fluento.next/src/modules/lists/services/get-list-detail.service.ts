@@ -84,20 +84,6 @@ export async function getListDetailService(
       uniqueBestResults.length,
   };
 
-  if (!list) {
-    throw new CustomError({
-      message: "La lista no existe",
-      statusCode: 404,
-    });
-  }
-
-  if (!list.isPublic && list.creatorId !== userId) {
-    throw new CustomError({
-      message: "No tienes permiso para ver esta lista",
-      statusCode: 403,
-    });
-  }
-
   return {
     id: list.id,
     name: list.name,
