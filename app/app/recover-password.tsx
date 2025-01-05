@@ -8,42 +8,38 @@ import { z } from 'zod';
 import { useForm } from '../hooks/useForm';
 
 // Esquema de validación
-const loginSchema = z.object({
+const recoverPasswordSchema = z.object({
   email: z
     .string()
     .min(1, 'El email es requerido')
     .email('El email no es válido'),
-  password: z
-    .string()
-    .min(1, 'La contraseña es requerida')
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .regex(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
-    .regex(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
-    .regex(/\d/, 'La contraseña debe contener al menos un número'),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type RecoverPasswordForm = z.infer<typeof recoverPasswordSchema>;
 
-export default function Login() {
+export default function RecoverPassword() {
   const router = useRouter();
   
-  const { values, errors, isValid, handleChange, handleSubmit } = useForm<LoginForm>({
+  const { values, errors, isValid, handleChange, handleSubmit } = useForm<RecoverPasswordForm>({
     initialValues: {
       email: '',
-      password: '',
     },
-    schema: loginSchema,
+    schema: recoverPasswordSchema,
   });
 
-  const onSubmit = (data: LoginForm) => {
-    // Aquí iría la lógica de login
+  const onSubmit = (data: RecoverPasswordForm) => {
+    // Aquí iría la lógica de recuperación de contraseña
     console.log('Form válido:', data);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.title}>Recuperar Contraseña</Text>
+        
+        <Text style={styles.description}>
+          Introduce tu email y te enviaremos las instrucciones para recuperar tu contraseña.
+        </Text>
         
         <View style={styles.form}>
           <TextField
@@ -55,32 +51,17 @@ export default function Login() {
             error={errors.email}
           />
 
-          <TextField
-            label="Contraseña"
-            value={values.password}
-            onChange={(value) => handleChange('password', value)}
-            placeholder="Tu contraseña"
-            type="password"
-            error={errors.password}
-          />
-
           <Button
-            label="Iniciar Sesión"
+            label="Enviar Instrucciones"
             onPress={() => handleSubmit(onSubmit)}
             disabled={!isValid}
           />
         </View>
 
         <View style={styles.links}>
-          <Link href="/register" replace asChild>
+          <Link href="/login" replace asChild>
             <TouchableOpacity>
-              <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <Link href="/recover-password" replace asChild>
-            <TouchableOpacity>
-              <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+              <Text style={styles.link}>Volver a Iniciar Sesión</Text>
             </TouchableOpacity>
           </Link>
         </View>
@@ -106,8 +87,14 @@ const styles = StyleSheet.create({
     fontSize: typography.h1.fontSize,
     fontWeight: typography.bold,
     color: colors.textPrimary,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
     textAlign: 'center',
+  },
+  description: {
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
   },
   form: {
     gap: spacing.lg,
