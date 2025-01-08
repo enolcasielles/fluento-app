@@ -102,7 +102,8 @@ export const colors = {
   disabled: palette.gray[200],
   disabledText: palette.gray[400],
   placeholder: palette.gray[400],
-  overlay: `${palette.gray[900]}80`, // 50% opacity
+  overlay: palette.gray[900],
+  shadow: palette.gray[900],
 } as const;
 
 export type ColorName = keyof typeof colors;

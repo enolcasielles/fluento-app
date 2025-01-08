@@ -5,6 +5,8 @@ import { Button } from '../components/base/Button';
 import { TextField } from '../components/base/TextField';
 import { Checkbox } from '../components/base/Checkbox';
 import { Select } from '../components/base/Select';
+import { ListCard } from '../components/base/ListCard';
+import { CategorySection, List } from '../components/base/CategorySection';
 
 const Section: React.FC<{
   title: string;
@@ -31,6 +33,40 @@ const THEME_OPTIONS = [
   { value: 'food', label: 'Comida' },
   { value: 'hobbies', label: 'Hobbies' },
   { value: 'culture', label: 'Cultura' },
+];
+
+const MOCK_LISTS: List[] = [
+  {
+    id: '1',
+    title: 'Conversaciones Diarias',
+    description: 'Aprende las frases más comunes para desenvolverte en situaciones cotidianas como ir al supermercado, pedir en un restaurante o hablar con amigos.',
+    image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e',
+    difficulty: 'Principiante',
+  },
+  {
+    id: '2',
+    title: 'Inglés para el Trabajo',
+    description: 'Mejora tu inglés profesional con frases y vocabulario específico para reuniones, emails y presentaciones.',
+    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216',
+    difficulty: 'Intermedio',
+    status: 'IN_PROGRESS',
+  },
+  {
+    id: '3',
+    title: 'Viajes y Turismo',
+    description: 'Prepárate para tu próximo viaje con frases esenciales para moverte por el aeropuerto, hotel y lugares turísticos.',
+    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828',
+    difficulty: 'Avanzado',
+    status: 'COMPLETED',
+  },
+  {
+    id: '4',
+    title: 'Lista con Error',
+    description: 'Esta lista muestra cómo se ve el estado de error cuando hay algún problema con la generación.',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
+    difficulty: 'Intermedio',
+    status: 'FAILED',
+  },
 ];
 
 export default function DesignSystem() {
@@ -60,6 +96,55 @@ export default function DesignSystem() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.pageTitle}>Design System</Text>
+
+      {/* Category Sections */}
+      <Section title="Category Sections">
+        <CategorySection
+          title="Listas Recomendadas"
+          lists={MOCK_LISTS}
+          onListPress={(list) => console.log('Lista presionada:', list.title)}
+        />
+        <CategorySection
+          title="Listas Populares"
+          lists={MOCK_LISTS.slice(1)}
+          onListPress={(list) => console.log('Lista presionada:', list.title)}
+        />
+      </Section>
+
+      {/* ListCards */}
+      <Section title="ListCards">
+        <ListCard
+          title="Conversaciones Diarias"
+          description="Aprende las frases más comunes para desenvolverte en situaciones cotidianas como ir al supermercado, pedir en un restaurante o hablar con amigos."
+          image="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e"
+          difficulty="Principiante"
+          onPress={() => {}}
+        />
+        <ListCard
+          title="Inglés para el Trabajo"
+          description="Mejora tu inglés profesional con frases y vocabulario específico para reuniones, emails y presentaciones."
+          image="https://images.unsplash.com/photo-1521791136064-7986c2920216"
+          difficulty="Intermedio"
+          status="IN_PROGRESS"
+          onPress={() => {}}
+        />
+        <ListCard
+          title="Viajes y Turismo"
+          description="Prepárate para tu próximo viaje con frases esenciales para moverte por el aeropuerto, hotel y lugares turísticos."
+          image="https://images.unsplash.com/photo-1488646953014-85cb44e25828"
+          difficulty="Avanzado"
+          status="COMPLETED"
+          onPress={() => {}}
+        />
+        <ListCard
+          title="Lista con Error"
+          description="Esta lista muestra cómo se ve el estado de error cuando hay algún problema con la generación."
+          image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
+          difficulty="Intermedio"
+          status="FAILED"
+          onPress={() => {}}
+        />
+      </Section>
 
       {/* Selects */}
       <Section title="Selects">
@@ -232,7 +317,7 @@ export default function DesignSystem() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   pageTitle: {
     fontSize: typography.h1.fontSize,
