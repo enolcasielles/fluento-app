@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
 import { useError } from '@/contexts/error.context';
 import { CustomError } from '@/utils/custom-error';
 import { SavedList } from '@/types/saved-list';
+import { Button } from '@/components/base/Button';
+
+const EmptyState = () => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyTitle}>No tienes listas guardadas</Text>
+    <Text style={styles.emptyDescription}>
+      Explora las listas disponibles y guarda las que más te interesen para practicarlas más tarde
+    </Text>
+  </View>
+);
 
 export default function SavedLists() {
   const router = useRouter();
@@ -45,6 +55,10 @@ export default function SavedLists() {
     );
   }
 
+  if (lists.length === 0) {
+    return <EmptyState />;
+  }
+
   return (
     <FlatList
       data={lists}
@@ -79,5 +93,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.background,
+  },
+  emptyContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  emptyTitle: {
+    fontSize: typography.h2.fontSize,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  emptyDescription: {
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 }); 
