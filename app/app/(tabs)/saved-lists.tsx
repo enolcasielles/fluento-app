@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { colors, spacing } from '../../theme';
@@ -14,10 +14,14 @@ export default function SavedLists() {
   const { getSavedLists } = useApiContext();
   const [lists, setLists] = useState<SavedList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const fetchSavedLists = async () => {
     try {
-      setIsLoading(true);
+      if (isInitialLoading) {
+        setIsInitialLoading(false);
+        setIsLoading(true);
+      }
       const data = await getSavedLists();
       setLists(data.lists);
     } catch (error) {
@@ -30,12 +34,8 @@ export default function SavedLists() {
   useFocusEffect(
     React.useCallback(() => {
       fetchSavedLists();
-    }, [])
+    }, [isInitialLoading])
   );
-
-  const handleListPress = (list: SavedList) => {
-    router.push(`/lists/${list.id}`);
-  };
 
   if (isLoading) {
     return (
@@ -56,7 +56,7 @@ export default function SavedLists() {
           description={item.description}
           image={item.imageUrl}
           difficulty={item.difficulty}
-          onPress={() => handleListPress(item)}
+          onPress={() => router.push(`/lists/${item.id}`)}
         />
       )}
       keyExtractor={(item) => item.id}

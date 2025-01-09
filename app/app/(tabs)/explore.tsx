@@ -14,10 +14,14 @@ export default function Explore() {
   const { getExplore } = useApiContext();
   const [categories, setCategories] = useState<ExploreCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  const fetchExplore = async () => {
+  const fetchExplore = async (isInitial: boolean = false) => {
     try {
-      setIsLoading(true);
+      if (isInitialLoading) {
+        setIsInitialLoading(false);
+        setIsLoading(true);
+      }
       const data = await getExplore();
       setCategories(data.categories);
     } catch (error) {
@@ -30,12 +34,8 @@ export default function Explore() {
   useFocusEffect(
     React.useCallback(() => {
       fetchExplore();
-    }, [])
+    }, [isInitialLoading])
   );
-
-  const handleListPress = (list: ExploreList) => {
-    router.push(`/lists/${list.id}`);
-  };
 
   if (isLoading) {
     return (
@@ -56,7 +56,7 @@ export default function Explore() {
           key={category.id}
           title={category.name}
           lists={category.lists}
-          onListPress={handleListPress}
+          onListPress={(list) => router.push(`/lists/${list.id}`)}
         />
       ))}
     </ScrollView>
