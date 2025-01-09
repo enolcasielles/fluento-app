@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { colors, spacing, typography, dimensions } from '../theme';
@@ -6,6 +6,11 @@ import { TextField } from '../components/base/TextField';
 import { Button } from '../components/base/Button';
 import { z } from 'zod';
 import { useForm } from '../hooks/useForm';
+import { CustomError } from '@/utils/custom-error';
+import { supabase } from '@/lib/supabase';
+import { useError } from '@/contexts/error.context';
+import { loginService } from './services/auth.service';
+import { useAuthContext } from '@/contexts/auth.context';
 
 // Esquema de validación
 const loginSchema = z.object({
@@ -26,7 +31,10 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const router = useRouter();
-  
+  const { saveAuthToken } = useAuthContext();
+  const { showError } = useError();
+  const [loading, setLoading] = useState(false);
+
   const { values, errors, isValid, handleChange, handleSubmit } = useForm<LoginForm>({
     initialValues: {
       email: '',
@@ -35,9 +43,17 @@ export default function Login() {
     schema: loginSchema,
   });
 
-  const onSubmit = (data: LoginForm) => {
-    // Aquí iría la lógica de login
-    console.log('Form válido:', data);
+  const onSubmit = async ({email, password}: LoginForm) => {
+    try {
+      setLoading(true);
+      const response = await loginService(email, password);
+      await saveAuthToken(response.accessToken);
+      router.replace('/explore');
+    } catch (error) {
+      showError(error as CustomError);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,6 +84,7 @@ export default function Login() {
             label="Iniciar Sesión"
             onPress={() => handleSubmit(onSubmit)}
             disabled={!isValid}
+            loading={loading}
           />
         </View>
 

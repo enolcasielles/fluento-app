@@ -2,20 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors, spacing, typography } from '../../theme';
 import { ListCard } from './ListCard';
-
-export interface List {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  difficulty: string;
-  status?: 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
-}
+import { ExploreList } from '@/types/explore';
 
 interface CategorySectionProps {
   title: string;
-  lists: List[];
-  onListPress: (list: List) => void;
+  lists: ExploreList[];
+  onListPress: (list: ExploreList) => void;
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -35,11 +27,11 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         {lists.map((list) => (
           <View key={list.id} style={styles.cardContainer}>
             <ListCard
-              title={list.title}
+              title={list.name}
               description={list.description}
-              image={list.image}
+              image={list.imageUrl}
               difficulty={list.difficulty}
-              status={list.status}
+              status='COMPLETED'
               onPress={() => onListPress(list)}
             />
           </View>

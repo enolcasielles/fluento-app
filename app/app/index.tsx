@@ -23,6 +23,11 @@ export default function Home() {
         variant="secondary"
         onPress={() => router.push('/login')}
       />
+      <Button
+        label="Explorar Listas"
+        variant="outline"
+        onPress={() => router.push('/(tabs)/explore')}
+      />
     </View>
   );
 }

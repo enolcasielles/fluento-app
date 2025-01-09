@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import { useApiContext } from './api.context';
-
 import { User } from '@/types/user';
 import { CustomError } from '@/utils/custom-error';
 
@@ -20,7 +18,6 @@ export const AuthContext = createContext<AuthContextProps>(null);
 export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }: any) => {
-  const { getUserProfile } = useApiContext();
   const [user, setUser] = useState<User | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,8 +48,8 @@ export const AuthContextProvider = ({ children }: any) => {
     try {
       setIsLoading(true);
       if (authToken) {
-        const response = await getUserProfile();
-        setUser(response);
+        // const response = await getUserProfile();
+        // setUser(response);
       } else {
         setUser(null);
       }

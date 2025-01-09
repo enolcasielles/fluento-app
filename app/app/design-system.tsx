@@ -6,7 +6,9 @@ import { TextField } from '../components/base/TextField';
 import { Checkbox } from '../components/base/Checkbox';
 import { Select } from '../components/base/Select';
 import { ListCard } from '../components/base/ListCard';
-import { CategorySection, List } from '../components/base/CategorySection';
+import { CategorySection } from '../components/base/CategorySection';
+import { Difficulty } from '@/enums/difficulty.enum';
+import { ExploreList } from '@/types/explore';
 
 const Section: React.FC<{
   title: string;
@@ -35,37 +37,38 @@ const THEME_OPTIONS = [
   { value: 'culture', label: 'Cultura' },
 ];
 
-const MOCK_LISTS: List[] = [
+const MOCK_LISTS: ExploreList[] = [
   {
     id: '1',
-    title: 'Conversaciones Diarias',
+    name: 'Conversaciones Diarias',
     description: 'Aprende las frases más comunes para desenvolverte en situaciones cotidianas como ir al supermercado, pedir en un restaurante o hablar con amigos.',
-    image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e',
-    difficulty: 'Principiante',
+    imageUrl: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e',
+    difficulty: Difficulty.BEGINNER,
+    totalUnits: 10,
   },
   {
     id: '2',
-    title: 'Inglés para el Trabajo',
+    name: 'Inglés para el Trabajo',
     description: 'Mejora tu inglés profesional con frases y vocabulario específico para reuniones, emails y presentaciones.',
-    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216',
-    difficulty: 'Intermedio',
-    status: 'IN_PROGRESS',
+    imageUrl: 'https://images.unsplash.com/photo-1521791136064-7986c2920216',
+    difficulty: Difficulty.INTERMEDIATE,
+    totalUnits: 10,
   },
   {
     id: '3',
-    title: 'Viajes y Turismo',
+    name: 'Viajes y Turismo',
     description: 'Prepárate para tu próximo viaje con frases esenciales para moverte por el aeropuerto, hotel y lugares turísticos.',
-    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828',
-    difficulty: 'Avanzado',
-    status: 'COMPLETED',
+    imageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828',
+    difficulty: Difficulty.ADVANCED,
+    totalUnits: 10,
   },
   {
     id: '4',
-    title: 'Lista con Error',
+    name: 'Lista con Error',
     description: 'Esta lista muestra cómo se ve el estado de error cuando hay algún problema con la generación.',
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
-    difficulty: 'Intermedio',
-    status: 'FAILED',
+    imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
+    difficulty: Difficulty.INTERMEDIATE,
+    totalUnits: 10,
   },
 ];
 
@@ -102,12 +105,12 @@ export default function DesignSystem() {
         <CategorySection
           title="Listas Recomendadas"
           lists={MOCK_LISTS}
-          onListPress={(list) => console.log('Lista presionada:', list.title)}
+          onListPress={(list) => console.log('Lista presionada:', list.name)}
         />
         <CategorySection
           title="Listas Populares"
           lists={MOCK_LISTS.slice(1)}
-          onListPress={(list) => console.log('Lista presionada:', list.title)}
+          onListPress={(list) => console.log('Lista presionada:', list.name)}
         />
       </Section>
 

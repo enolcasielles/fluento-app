@@ -102,7 +102,7 @@ export const colors = {
   disabled: palette.gray[200],
   disabledText: palette.gray[400],
   placeholder: palette.gray[400],
-  overlay: palette.gray[900],
+  overlay: `${palette.gray[900]}AA`,
   shadow: palette.gray[900],
 } as const;
 

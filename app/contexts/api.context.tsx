@@ -5,14 +5,27 @@ import { useAuthContext } from './auth.context';
 import { User } from '@/types/user';
 import { ApiError } from '@/types/api-error';
 import { CustomError } from '@/utils/custom-error';
+import { GetExploreResponse } from '@/types/explore';
+import { ListDetail } from '@/types/list-detail';
 
 interface ApiContextType {
-  // User endpoints
   getUserProfile: () => Promise<User>;
-  // Aquí iremos añadiendo más métodos según necesitemos
+  getExplore: () => Promise<GetExploreResponse>;
+  getListDetail: (listId: string) => Promise<ListDetail>;
+  saveList: (listId: string) => Promise<{ success: boolean }>;
+  deleteSavedList: (listId: string) => Promise<{ success: boolean }>;
+  retryCreateList: (listId: string) => Promise<{
+    id: string;
+    name: string;
+    topic: string;
+    imageUrl: string;
+    difficulty: string;
+    grammarStructures: string[];
+    creationStatus: 'IN_PROGRESS';
+  }>;
 }
 
-const API_URL = 'http://localhost:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const ApiContext = createContext<ApiContextType>(null);
 
@@ -28,7 +41,10 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
 
   const executeRequest = async ({ path, refresh = true, ...options }: ExecuteRequestOptions) => {
     try {
-      const response = await fetch(`${API_URL}${path}`, {
+      const url = `${API_URL}${path}`;
+      console.log(url);
+      console.log(authToken);
+      const response = await fetch(url, {
         ...options,
         headers: {
           ...options.headers,
@@ -60,7 +76,7 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshToken = async () => {
     const response = await executeRequest({
-      path: '/api/auth/refresh',
+      path: '/auth/refresh',
       method: 'POST',
       refresh: false,
     });
@@ -69,13 +85,54 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getUserProfile = async (): Promise<User> => {
     return executeRequest({
-      path: '/api/user',
+      path: '/user',
       method: 'GET',
+    });
+  };
+
+  const getExplore = async (): Promise<GetExploreResponse> => {
+    return executeRequest({
+      path: '/explore',
+      method: 'GET',
+      refresh: false,
+    });
+  };
+
+  const getListDetail = async (listId: string): Promise<ListDetail> => {
+    return executeRequest({
+      path: `/lists/${listId}`,
+      method: 'GET',
+    });
+  };
+
+  const saveList = async (listId: string): Promise<{ success: boolean }> => {
+    return executeRequest({
+      path: `/lists/${listId}/save`,
+      method: 'POST',
+    });
+  };
+
+  const deleteSavedList = async (listId: string): Promise<{ success: boolean }> => {
+    return executeRequest({
+      path: `/lists/${listId}/save`,
+      method: 'DELETE',
+    });
+  };
+
+  const retryCreateList = async (listId: string) => {
+    return executeRequest({
+      path: `/lists/${listId}/retry`,
+      method: 'POST',
     });
   };
 
   const value = {
     getUserProfile,
+    getExplore,
+    getListDetail,
+    saveList,
+    deleteSavedList,
+    retryCreateList,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
