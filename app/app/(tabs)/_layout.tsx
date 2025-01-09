@@ -27,7 +27,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="saved"
+        name="my-lists"
+        options={{
+          title: 'Mis Listas',
+          tabBarLabel: 'Mis Listas',
+          headerTitle: 'Mis Listas',
+        }}
+      />
+      <Tabs.Screen
+        name="saved-lists"
         options={{
           title: 'Guardadas',
           tabBarLabel: 'Guardadas',
@@ -35,11 +43,11 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="my-lists"
+        name="profile"
         options={{
-          title: 'Mis Listas',
-          tabBarLabel: 'Mis Listas',
-          headerTitle: 'Mis Listas',
+          title: 'Perfil',
+          tabBarLabel: 'Perfil',
+          headerTitle: 'Mi Perfil',
         }}
       />
     </Tabs>

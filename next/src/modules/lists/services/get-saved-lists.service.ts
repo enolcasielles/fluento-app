@@ -1,6 +1,6 @@
 import { prisma } from "@/core/lib/prisma";
 import { GetSavedListsResponse } from "../responses/GetSavedListsResponse";
-import { Difficulty } from "@/core/enums/difficulty.enum";
+import { Difficulty, DifficultyLabels } from "@/core/enums/difficulty.enum";
 
 export async function getSavedListsService(
   userId: string,
@@ -21,7 +21,7 @@ export async function getSavedListsService(
         name: list.name,
         description: list.description || "",
         imageUrl: list.imageUrl || "",
-        difficulty: list.difficulty as Difficulty,
+        difficulty: DifficultyLabels[list.difficulty as Difficulty],
         totalUnits: list.totalUnits,
         creationStatus: list.creationStatus,
       };

@@ -4,6 +4,8 @@ import { colors, spacing, borderRadius, typography } from '../../theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
 
+export const BUTTON_HEIGHT = 48;
+
 interface ButtonProps {
   variant?: ButtonVariant;
   label: string;
@@ -89,7 +91,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: 48,
+    height: BUTTON_HEIGHT,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.medium,
     justifyContent: 'center',

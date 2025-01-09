@@ -7,6 +7,18 @@ import { ApiError } from '@/types/api-error';
 import { CustomError } from '@/utils/custom-error';
 import { GetExploreResponse } from '@/types/explore';
 import { ListDetail } from '@/types/list-detail';
+import { GetMyListsResponse } from '@/types/my-lists';
+import { GetSavedListsResponse } from '@/types/saved-list';
+import { 
+  CreateListRequest, 
+  CreateListResponse, 
+  RetryCreateListResponse 
+} from '@/types/create-list';
+import { 
+  GetListSessionResponse, 
+  EvaluateAnswerResponse, 
+  SubmitResultResponse 
+} from '@/types/session';
 
 interface ApiContextType {
   getUserProfile: () => Promise<User>;
@@ -14,15 +26,13 @@ interface ApiContextType {
   getListDetail: (listId: string) => Promise<ListDetail>;
   saveList: (listId: string) => Promise<{ success: boolean }>;
   deleteSavedList: (listId: string) => Promise<{ success: boolean }>;
-  retryCreateList: (listId: string) => Promise<{
-    id: string;
-    name: string;
-    topic: string;
-    imageUrl: string;
-    difficulty: string;
-    grammarStructures: string[];
-    creationStatus: 'IN_PROGRESS';
-  }>;
+  retryCreateList: (listId: string) => Promise<RetryCreateListResponse>;
+  getMyLists: () => Promise<GetMyListsResponse>;
+  getSavedLists: () => Promise<GetSavedListsResponse>;
+  createList: (data: CreateListRequest) => Promise<CreateListResponse>;
+  getListSession: (listId: string) => Promise<GetListSessionResponse>;
+  evaluateAnswer: (sessionId: string, unitId: string, audioFile: FormData) => Promise<EvaluateAnswerResponse>;
+  submitResult: (sessionId: string, unitId: string, score: number) => Promise<SubmitResultResponse>;
 }
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -126,6 +136,56 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const getMyLists = async () => {
+    return executeRequest({
+      path: '/lists',
+      method: 'GET',
+    });
+  };
+
+  const getSavedLists = async () => {
+    return executeRequest({
+      path: '/lists/saved',
+      method: 'GET',
+    });
+  };
+
+  const createList = async (data: {
+    name: string;
+    topic: string;
+    difficulty: 'any' | 'beginner' | 'intermediate' | 'advanced';
+    grammarStructures: string;
+  }) => {
+    return executeRequest({
+      path: '/lists',
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  };
+
+  const getListSession = async (listId: string) => {
+    return executeRequest({
+      path: `/lists/${listId}/session`,
+      method: 'GET',
+    });
+  };
+
+  const evaluateAnswer = async (sessionId: string, unitId: string, audioFile: FormData) => {
+    return executeRequest({
+      path: `/sessions/${sessionId}/units/${unitId}/evaluate`,
+      method: 'POST',
+      body: audioFile,
+    });
+  };
+
+  const submitResult = async (sessionId: string, unitId: string, score: number) => {
+    return executeRequest({
+      path: `/sessions/${sessionId}/units/${unitId}/result`,
+      method: 'POST',
+      body: JSON.stringify({ score }),
+    });
+  };
+
   const value = {
     getUserProfile,
     getExplore,
@@ -133,6 +193,12 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     saveList,
     deleteSavedList,
     retryCreateList,
+    getMyLists,
+    getSavedLists,
+    createList,
+    getListSession,
+    evaluateAnswer,
+    submitResult,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

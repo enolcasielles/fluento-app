@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { colors, spacing } from '../../theme';
-import { CategorySection } from '../../components/base/CategorySection';
+import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
 import { useError } from '@/contexts/error.context';
 import { CustomError } from '@/utils/custom-error';
-import { ExploreCategory, ExploreList } from '@/types/explore';
+import { SavedList } from '@/types/saved-list';
 
-export default function Explore() {
+export default function SavedLists() {
   const router = useRouter();
   const { showError } = useError();
-  const { getExplore } = useApiContext();
-  const [categories, setCategories] = useState<ExploreCategory[]>([]);
+  const { getSavedLists } = useApiContext();
+  const [lists, setLists] = useState<SavedList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchExplore = async () => {
+  const fetchSavedLists = async () => {
     try {
       setIsLoading(true);
-      const data = await getExplore();
-      setCategories(data.categories);
+      const data = await getSavedLists();
+      setLists(data.lists);
     } catch (error) {
       showError(error as CustomError);
     } finally {
@@ -29,11 +29,11 @@ export default function Explore() {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchExplore();
+      fetchSavedLists();
     }, [])
   );
 
-  const handleListPress = (list: ExploreList) => {
+  const handleListPress = (list: SavedList) => {
     router.push(`/lists/${list.id}`);
   };
 
@@ -46,20 +46,22 @@ export default function Explore() {
   }
 
   return (
-    <ScrollView 
+    <FlatList
+      data={lists}
       style={styles.container}
       contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {categories.map((category) => (
-        <CategorySection
-          key={category.id}
-          title={category.name}
-          lists={category.lists}
-          onListPress={handleListPress}
+      renderItem={({ item }) => (
+        <ListCard
+          title={item.name}
+          description={item.description}
+          image={item.imageUrl}
+          difficulty={item.difficulty}
+          onPress={() => handleListPress(item)}
         />
-      ))}
-    </ScrollView>
+      )}
+      keyExtractor={(item) => item.id}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }
 
@@ -69,7 +71,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    paddingVertical: spacing.lg,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   loadingContainer: {
     flex: 1,

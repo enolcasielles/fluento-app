@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { colors, spacing, typography, dimensions } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { Button } from '../../components/base/Button';
 import { useApiContext } from '@/contexts/api.context';
 import { useError } from '@/contexts/error.context';
 import { CustomError } from '@/utils/custom-error';
 import { ListDetail } from '@/types/list-detail';
 import { CreationStatus } from '@/enums/creation-status.enum';
+import Svg, { Path } from 'react-native-svg';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
+import { BUTTON_HEIGHT } from '@/components/base/Button';
 
-const FOOTER_HEIGHT = 24 + 48 + 24; // padding.lg + button.height + padding.lg
+const FOOTER_HEIGHT = spacing.lg + BUTTON_HEIGHT + spacing.lg
+
+const HeartIcon = ({ filled }: { filled: boolean }) => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+      fill={filled ? colors.error : 'none'}
+      stroke={filled ? colors.error : colors.textSecondary}
+      strokeWidth={2}
+    />
+  </Svg>
+);
 
 export default function ListDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { showError } = useError();
-  const { getListDetail, saveList, retryCreateList } = useApiContext();
+  const { getListDetail, saveList, deleteSavedList, retryCreateList } = useApiContext();
   const [list, setList] = useState<ListDetail>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,7 +42,6 @@ export default function ListDetailScreen() {
   const fetchListDetail = async () => {
     try {
       setIsLoading(true);
-      // TODO: Implementar llamada real
       const data = await getListDetail(id as string);
       setList(data);
     } catch (error) {
@@ -38,12 +51,16 @@ export default function ListDetailScreen() {
     }
   };
 
-  const handleSaveAndPractice = async () => {
+  const handleToggleSave = async () => {
     if (!list) return;
     try {
       setIsSaving(true);
-      await saveList(list.id);
-      router.push(`/practice/${list.id}`);
+      if (list.isSaved) {
+        await deleteSavedList(list.id);
+      } else {
+        await saveList(list.id);
+      }
+      setList({ ...list, isSaved: !list.isSaved });
     } catch (error) {
       showError(error as CustomError);
     } finally {
@@ -84,89 +101,94 @@ export default function ListDetailScreen() {
 
   if (!list) return null;
 
-  console.log(list);
+  console.log(list.isSaved);
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <Image source={{ uri: list.imageUrl }} style={styles.image} />
-        
-        <View style={styles.content}>
-          <Text style={styles.title}>{list.name}</Text>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: list.imageUrl }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleToggleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color={colors.error} />
+              ) : (
+                <HeartIcon filled={list.isSaved} />
+              )}
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.content}>
+            <Text style={styles.title}>{list.name}</Text>
 
-          {list.creationStatus === CreationStatus.FAILED && (
-            <View style={styles.errorSection}>
-              <Text style={styles.errorTitle}>Lo sentimos</Text>
-              <Text style={styles.errorText}>
-                Ha ocurrido un error al generar esta lista. Puedes intentar crearla de nuevo o contactar con soporte.
-              </Text>
-              <View style={styles.errorActions}>
-                <Button
-                  label="Reintentar"
-                  onPress={handleRetryCreate}
-                  loading={isRetrying}
-                />
-                <Button
-                  label="Contactar Soporte"
-                  variant="outline"
-                  onPress={handleContactSupport}
-                />
+            {list.creationStatus === CreationStatus.FAILED && (
+              <View style={styles.errorSection}>
+                <Text style={styles.errorTitle}>Lo sentimos</Text>
+                <Text style={styles.errorText}>
+                  Ha ocurrido un error al generar esta lista. Puedes intentar crearla de nuevo o contactar con soporte.
+                </Text>
+                <View style={styles.errorActions}>
+                  <Button
+                    label="Reintentar"
+                    onPress={handleRetryCreate}
+                    loading={isRetrying}
+                  />
+                  <Button
+                    label="Contactar Soporte"
+                    variant="outline"
+                    onPress={handleContactSupport}
+                  />
+                </View>
+              </View>
+            )}
+
+            <View style={styles.infoSection}>
+              <Text style={styles.sectionTitle}>Información</Text>
+              <View style={styles.infoGrid}>
+                <InfoItem icon="DIFFICULTY" label="Dificultad" value={list.difficulty} />
+                <InfoItem icon="TOPIC" label="Temática" value={list.topic} />
+                <InfoItem icon="UNITS" label="Unidades" value={list.totalUnits.toString()} />
+                <InfoItem icon="GRAMMAR" label="Gramática" value={list.grammarStructures} />
               </View>
             </View>
-          )}
 
-          <View style={styles.infoSection}>
-            <Text style={styles.sectionTitle}>Información</Text>
-            <View style={styles.infoGrid}>
-              <InfoItem icon="DIFFICULTY" label="Dificultad" value={list.difficulty} />
-              <InfoItem icon="TOPIC" label="Temática" value={list.topic} />
-              <InfoItem icon="UNITS" label="Unidades" value={list.totalUnits.toString()} />
-              <InfoItem icon="GRAMMAR" label="Gramática" value={list.grammarStructures} />
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Descripción</Text>
-            <Text style={styles.description}>{list.description}</Text>
-          </View>
-
-          {list.userProgress && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Tus Resultados</Text>
-              <View style={styles.resultsGrid}>
-                <ResultItem 
-                  label="Unidades Practicadas" 
-                  value={`${list.userProgress.practicedUnits.toString()}`} 
-                />
-                <ResultItem 
-                  label="Unidades Superadas" 
-                  value={list.userProgress.passedUnits.toString()} 
-                />
-                <ResultItem 
-                  label="Puntuación Media" 
-                  value={list.userProgress.averageScore.toString()} 
-                />
-              </View>
+              <Text style={styles.sectionTitle}>Descripción</Text>
+              <Text style={styles.description}>{list.description}</Text>
             </View>
-          )}
-        </View>
-      </ScrollView>
 
-      <View style={styles.footer}>
-        {!list.isSaved ? (
-          <Button
-            label="Guardar y Practicar"
-            onPress={handleSaveAndPractice}
-            loading={isSaving}
-          />
-        ) : (
+            {list.userProgress && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Tus Resultados</Text>
+                <View style={styles.resultsGrid}>
+                  <ResultItem 
+                    label="Unidades Practicadas" 
+                    value={`${list.userProgress.practicedUnits.toString()}`} 
+                  />
+                  <ResultItem 
+                    label="Unidades Superadas" 
+                    value={list.userProgress.passedUnits.toString()} 
+                  />
+                  <ResultItem 
+                    label="Puntuación Media" 
+                    value={list.userProgress.averageScore.toString()} 
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        <View style={styles.footer}>
           <Button
             label="Practicar"
             onPress={handlePractice}
           />
-        )}
+        </View>
       </View>
-    </View>
   );
 }
 
@@ -212,10 +234,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
   },
+  imageContainer: {
+    position: 'relative',
+  },
   image: {
     width: '100%',
     height: 200,
     backgroundColor: colors.surface,
+  },
+  saveButton: {
+    position: 'absolute',
+    top: spacing.lg,
+    right: spacing.lg,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   content: {
     flex: 1,
