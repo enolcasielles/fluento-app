@@ -52,8 +52,6 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
   const executeRequest = async ({ path, refresh = true, ...options }: ExecuteRequestOptions) => {
     try {
       const url = `${API_URL}${path}`;
-      console.log(url);
-      console.log(authToken);
       const response = await fetch(url, {
         ...options,
         headers: {

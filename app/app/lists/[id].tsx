@@ -101,8 +101,6 @@ export default function ListDetailScreen() {
 
   if (!list) return null;
 
-  console.log(list.isSaved);
-
   return (
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
