@@ -9,7 +9,7 @@ import { useForm } from '../hooks/useForm';
 import { CustomError } from '@/utils/custom-error';
 import { supabase } from '@/lib/supabase';
 import { useError } from '@/contexts/error.context';
-import { loginService } from './services/auth.service';
+import { loginService } from '../services/auth.service';
 import { useAuthContext } from '@/contexts/auth.context';
 
 // Esquema de validación

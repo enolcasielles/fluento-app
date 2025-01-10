@@ -1,14 +1,19 @@
+import { CreationStatus } from "@/core/enums/creation-status.enum";
+import { Difficulty } from "@/core/enums/difficulty.enum";
+
 export interface GetListDetailResponse {
   id: string;
   name: string;
   description: string;
   imageUrl: string;
-  difficulty: string;
+  difficulty: Difficulty;
+  difficultyLabel: string;
   topic: string;
   grammarStructures: string;
   totalUnits: number;
   isSaved: boolean;
-  creationStatus: string;
+  creationStatus: CreationStatus;
+  creationStatusLabel: string;
   userProgress: {
     practicedUnits: number;
     passedUnits: number;

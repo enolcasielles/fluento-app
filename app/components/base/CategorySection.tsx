@@ -30,8 +30,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               title={list.name}
               description={list.description}
               image={list.imageUrl}
-              difficulty={list.difficulty}
-              status='COMPLETED'
+              difficultyLabel={list.difficultyLabel}
+              statusLabel={list.creationStatusLabel}
               onPress={() => onListPress(list)}
             />
           </View>

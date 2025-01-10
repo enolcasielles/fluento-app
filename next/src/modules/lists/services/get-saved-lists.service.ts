@@ -21,9 +21,9 @@ export async function getSavedListsService(
         name: list.name,
         description: list.description || "",
         imageUrl: list.imageUrl || "",
-        difficulty: DifficultyLabels[list.difficulty as Difficulty],
+        difficulty: list.difficulty as Difficulty,
+        difficultyLabel: DifficultyLabels[list.difficulty],
         totalUnits: list.totalUnits,
-        creationStatus: list.creationStatus,
       };
     }),
   };

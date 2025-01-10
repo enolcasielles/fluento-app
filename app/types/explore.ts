@@ -12,6 +12,7 @@ export interface ExploreList {
   description: string;
   imageUrl: string;
   difficulty: Difficulty;
+  difficultyLabel: string;
   totalUnits: number;
 }
 

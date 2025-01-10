@@ -6,33 +6,39 @@ import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
 import { useError } from '@/contexts/error.context';
 import { CustomError } from '@/utils/custom-error';
-import { SavedList } from '@/types/saved-list';
 import { Button } from '@/components/base/Button';
+import { MyList } from '@/types/my-lists';
 
-const EmptyState = () => (
+const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   <View style={styles.emptyContainer}>
-    <Text style={styles.emptyTitle}>No tienes listas guardadas</Text>
+    <Text style={styles.emptyTitle}>No has creado ninguna lista</Text>
     <Text style={styles.emptyDescription}>
-      Explora las listas disponibles y guarda las que más te interesen para practicarlas más tarde
+      Crea tu primera lista personalizada para practicar exactamente lo que necesitas
     </Text>
+    <View style={styles.emptyAction}>
+      <Button
+        label="Crear Lista"
+        onPress={onCreateList}
+      />
+    </View>
   </View>
 );
 
-export default function SavedLists() {
+export default function MyLists() {
   const router = useRouter();
   const { showError } = useError();
-  const { getSavedLists } = useApiContext();
-  const [lists, setLists] = useState<SavedList[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { getMyLists } = useApiContext();
+  const [lists, setLists] = useState<MyList[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchSavedLists = async () => {
+  const fetchMyLists = async () => {
     try {
       if (isInitialLoading) {
         setIsInitialLoading(false);
         setIsLoading(true);
       }
-      const data = await getSavedLists();
+      const data = await getMyLists();
       setLists(data.lists);
     } catch (error) {
       showError(error as CustomError);
@@ -43,9 +49,13 @@ export default function SavedLists() {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchSavedLists();
+      fetchMyLists();
     }, [isInitialLoading])
   );
+
+  const handleCreateList = () => {
+    router.push('/create');
+  };
 
   if (isLoading) {
     return (
@@ -56,27 +66,29 @@ export default function SavedLists() {
   }
 
   if (lists.length === 0) {
-    return <EmptyState />;
+    return <EmptyState onCreateList={handleCreateList} />;
   }
 
   return (
-    <FlatList
-      data={lists}
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      renderItem={({ item }) => (
-        <ListCard
-          title={item.name}
-          description={item.description}
-          image={item.imageUrl}
-          difficultyLabel={item.difficultyLabel}
-          statusLabel={item.creationStatusLabel}
-          onPress={() => router.push(`/lists/${item.id}`)}
-        />
-      )}
-      keyExtractor={(item) => item.id}
-      showsVerticalScrollIndicator={false}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={lists}
+        style={styles.list}
+        contentContainerStyle={styles.content}
+        renderItem={({ item }) => (
+          <ListCard
+            title={item.name}
+            description={item.description}
+            image={item.imageUrl}
+            difficultyLabel={item.difficultyLabel}
+            statusLabel={item.creationStatusLabel}
+            onPress={() => router.push(`/lists/${item.id}`)}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 }
 
@@ -84,6 +96,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  list: {
+    flex: 1,
   },
   content: {
     padding: spacing.lg,
@@ -114,5 +129,10 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
+    marginBottom: spacing.xl,
+  },
+  emptyAction: {
+    width: '100%',
+    maxWidth: 200,
   },
 }); 

@@ -7,5 +7,7 @@ export interface CreateListResponse {
   topic: string;
   grammarStructures: string;
   difficulty: Difficulty;
+  difficultyLabel: string;
   creationStatus: CreationStatus;
+  creationStatusLabel: string;
 }

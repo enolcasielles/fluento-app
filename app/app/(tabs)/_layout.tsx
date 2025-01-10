@@ -1,7 +1,11 @@
 import { Tabs } from 'expo-router';
 import { colors, typography } from '../../theme';
+import { Button } from '@/components/base/Button';
+import { useRouter } from 'expo-router';
 
 export default function TabsLayout() {
+  const router = useRouter();
+
   return (
     <Tabs
       screenOptions={{
@@ -32,6 +36,13 @@ export default function TabsLayout() {
           title: 'Mis Listas',
           tabBarLabel: 'Mis Listas',
           headerTitle: 'Mis Listas',
+          headerRight: () => (
+            <Button
+              variant="text"
+              label="Crear"
+              onPress={() => router.push('/create')}
+            />
+          ),
         }}
       />
       <Tabs.Screen

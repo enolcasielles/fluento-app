@@ -96,12 +96,15 @@ export async function getListDetailService(
     name: list.name,
     description: list.description || "",
     imageUrl: list.imageUrl || "",
-    difficulty: DifficultyLabels[list.difficulty as Difficulty],
+    difficulty: list.difficulty as Difficulty,
+    difficultyLabel: DifficultyLabels[list.difficulty as Difficulty],
     topic: list.topic,
     grammarStructures: list.grammarStructures,
     totalUnits: list.totalUnits,
     isSaved: savedList ? true : false,
-    creationStatus: CreationStatusLabels[list.creationStatus as CreationStatus],
+    creationStatus: list.creationStatus as CreationStatus,
+    creationStatusLabel:
+      CreationStatusLabels[list.creationStatus as CreationStatus],
     userProgress,
   };
 }

@@ -1,39 +1,27 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography, borderRadius, shadows } from '../../theme';
-
-type ListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+import { CreationStatus } from '@/enums/creation-status.enum';
+import { Difficulty } from '@/enums/difficulty.enum';
 
 interface ListCardProps {
   title: string;
   description: string;
   image: string;
-  difficulty: string;
-  status?: ListStatus;
+  difficultyLabel: string;
+  status?: CreationStatus;
+  statusLabel?: string;
   onPress: () => void;
 }
 
-const getStatusColor = (status?: ListStatus) => {
+const getStatusColor = (status?: CreationStatus) => {
   switch (status) {
-    case 'COMPLETED':
+    case CreationStatus.COMPLETED:
       return colors.success;
-    case 'FAILED':
+    case CreationStatus.FAILED:
       return colors.error;
-    case 'IN_PROGRESS':
+    case CreationStatus.IN_PROGRESS:
       return colors.info;
-    default:
-      return undefined;
-  }
-};
-
-const getStatusLabel = (status?: ListStatus) => {
-  switch (status) {
-    case 'COMPLETED':
-      return 'Completada';
-    case 'FAILED':
-      return 'Error';
-    case 'IN_PROGRESS':
-      return 'En Progreso';
     default:
       return undefined;
   }
@@ -43,8 +31,9 @@ export const ListCard: React.FC<ListCardProps> = ({
   title,
   description,
   image,
-  difficulty,
+  difficultyLabel,
   status,
+  statusLabel,
   onPress,
 }) => {
   return (
@@ -60,7 +49,7 @@ export const ListCard: React.FC<ListCardProps> = ({
           <Text style={styles.title} numberOfLines={1}>{title}</Text>
           {status && (
             <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
-              <Text style={styles.statusText}>{getStatusLabel(status)}</Text>
+              <Text style={styles.statusText}>{statusLabel}</Text>
             </View>
           )}
         </View>
@@ -71,7 +60,7 @@ export const ListCard: React.FC<ListCardProps> = ({
 
         <View style={styles.footer}>
           <View style={styles.difficultyBadge}>
-            <Text style={styles.difficultyText}>{difficulty}</Text>
+            <Text style={styles.difficultyText}>{difficultyLabel}</Text>
           </View>
         </View>
       </View>

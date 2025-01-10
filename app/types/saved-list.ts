@@ -1,3 +1,5 @@
+import { Difficulty } from "@/enums/difficulty.enum";
+
 export interface GetSavedListsResponse {
   lists: SavedList[];
 }
@@ -7,6 +9,7 @@ export interface SavedList {
   name: string;
   description: string;
   imageUrl: string;
-  difficulty: string;
+  difficulty: Difficulty;
+  difficultyLabel: string;
   totalUnits: number;
 }

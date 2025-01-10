@@ -1,4 +1,4 @@
-import { CreationStatus } from ".prisma/client";
+import { CreationStatus } from "@/core/enums/creation-status.enum";
 import { Difficulty } from "@/core/enums/difficulty.enum";
 
 export interface GetMyListsResponse {
@@ -8,7 +8,9 @@ export interface GetMyListsResponse {
     description: string;
     imageUrl: string;
     difficulty: Difficulty;
+    difficultyLabel: string;
     totalUnits: number;
     creationStatus: CreationStatus;
+    creationStatusLabel: string;
   }[];
 }

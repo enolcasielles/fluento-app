@@ -136,14 +136,14 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const getMyLists = async () => {
+  const getMyLists = async (): Promise<GetMyListsResponse> => {
     return executeRequest({
       path: '/lists',
       method: 'GET',
     });
   };
 
-  const getSavedLists = async () => {
+  const getSavedLists = async (): Promise<GetSavedListsResponse> => {
     return executeRequest({
       path: '/lists/saved',
       method: 'GET',

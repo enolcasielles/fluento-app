@@ -1,3 +1,6 @@
+import { CreationStatus } from "@/enums/creation-status.enum";
+import { Difficulty } from "@/enums/difficulty.enum";
+
 export type ListDifficulty = 'any' | 'beginner' | 'intermediate' | 'advanced';
 export type ListCreationStatus = 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 
@@ -13,9 +16,11 @@ export interface CreateListResponse {
   name: string;
   topic: string;
   imageUrl: string;
-  difficulty: string;
+  difficulty: Difficulty;
+  difficultyLabel: string;
   grammarStructures: string;
-  creationStatus: ListCreationStatus;
+  creationStatus: CreationStatus;
+  creationStatusLabel: string;
 }
 
 export interface RetryCreateListResponse {
@@ -23,7 +28,9 @@ export interface RetryCreateListResponse {
   name: string;
   topic: string;
   imageUrl: string;
-  difficulty: string;
+  difficulty: Difficulty;
+  difficultyLabel: string;
   grammarStructures: string[];
-  creationStatus: 'IN_PROGRESS';
+  creationStatus: CreationStatus;
+  creationStatusLabel: string;
 } 

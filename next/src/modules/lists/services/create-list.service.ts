@@ -2,9 +2,12 @@ import { prisma } from "@/core/lib/prisma";
 import { CreateListRequest } from "../requests/CreateListRequest";
 import { CreateListResponse } from "../responses/CreateListResponse";
 import { CustomError } from "@/core/errors";
-import { Difficulty } from "@/core/enums/difficulty.enum";
+import { Difficulty, DifficultyLabels } from "@/core/enums/difficulty.enum";
 import { generateListUnitsService } from "./generate-list-units.service";
-import { CreationStatus } from "@/core/enums/creation-status.enum";
+import {
+  CreationStatus,
+  CreationStatusLabels,
+} from "@/core/enums/creation-status.enum";
 
 export async function createListService(
   userId: string,
@@ -44,6 +47,8 @@ export async function createListService(
     topic: updatedList.topic,
     grammarStructures: updatedList.grammarStructures,
     difficulty: updatedList.difficulty as Difficulty,
+    difficultyLabel: DifficultyLabels[updatedList.difficulty],
     creationStatus: updatedList.creationStatus as CreationStatus,
+    creationStatusLabel: CreationStatusLabels[updatedList.creationStatus],
   };
 }
