@@ -12,7 +12,6 @@ const initVoices = async () => {
   if (availableVoices.length === 0) {
     try {
       availableVoices = await Speech.getAvailableVoicesAsync();
-      console.log('Available voices:', availableVoices);
     } catch (error) {
       console.error('Error initializing speech service:', error);
       throw error;

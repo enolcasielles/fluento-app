@@ -32,7 +32,7 @@ interface ApiContextType {
   createList: (data: CreateListRequest) => Promise<CreateListResponse>;
   getListSession: (listId: string) => Promise<GetListSessionResponse>;
   evaluateAnswer: (sessionId: string, unitId: string, audioFile: FormData) => Promise<EvaluateAnswerResponse>;
-  submitResult: (sessionId: string, unitId: string, score: number) => Promise<SubmitResultResponse>;
+  submitResult: (sessionId: string, unitId: string, score: number, answer: string) => Promise<SubmitResultResponse>;
 }
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -176,11 +176,11 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const submitResult = async (sessionId: string, unitId: string, score: number) => {
+  const submitResult = async (sessionId: string, unitId: string, score: number, answer: string) => {
     return executeRequest({
       path: `/sessions/${sessionId}/units/${unitId}/result`,
       method: 'POST',
-      body: JSON.stringify({ score }),
+      body: JSON.stringify({ score, answer }),
     });
   };
 

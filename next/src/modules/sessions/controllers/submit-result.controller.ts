@@ -31,6 +31,7 @@ export async function SubmitResultController(
     if (error instanceof CustomError) {
       return apiError(error);
     }
+    console.error(error);
     return apiError(
       new CustomError({
         message:

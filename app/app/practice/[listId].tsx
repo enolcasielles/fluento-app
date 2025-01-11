@@ -1,26 +1,50 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useApiContext } from '@/contexts/api.context';
 import { Unit } from '@/types/session';
 import * as speechService from '@/services/speech.service';
+import * as recordingService from '@/services/recording.service';
 
 type PracticeState = 'QUESTION' | 'LISTENING' | 'ANSWER' | 'RESULT';
 
 export default function PracticeScreen() {
   const router = useRouter();
   const { listId } = useLocalSearchParams();
-  const { getListSession, submitResult } = useApiContext();
+  const { getListSession, submitResult, evaluateAnswer } = useApiContext();
 
   const [sessionId, setSessionId] = useState<string>();
   const [currentUnit, setCurrentUnit] = useState<Unit>();
   const [practiceState, setPracticeState] = useState<PracticeState>('QUESTION');
+  const [isEvaluating, setIsEvaluating] = useState(false);
   const [score, setScore] = useState<number>();
+  const [answer, setAnswer] = useState<string>();
+  const isMounted = useRef(true);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const practiceStateRef = useRef<PracticeState>('QUESTION');
+
+  useEffect(() => {
+    practiceStateRef.current = practiceState;
+  }, [practiceState]);
 
   useEffect(() => {
     loadSession();
+    return () => {
+      speechService.stop();
+      recordingService.stopRecording();
+      isMounted.current = false;
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
   }, []);
+
+  const updateState = (state: PracticeState) => {
+    if (!isMounted.current) return;
+    setPracticeState(state);
+  };
 
   const loadSession = async () => {
     try {
@@ -40,46 +64,90 @@ export default function PracticeScreen() {
     }
   };
 
+  const initRecording = async () => {
+    try {
+      if (!isMounted.current) return;
+      await recordingService.startRecording();
+      updateState('LISTENING');
+    } catch (error) {
+      console.error('Error initializing recording:', error);
+    }
+  }
+
   const handleQuestionState = async () => {
     if (!currentUnit) return;
-    await playText(currentUnit.question.text, 'en');
-    setTimeout(() => {
-      setPracticeState('LISTENING');
+    await playText(currentUnit.question.text, 'es');
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      initRecording();
     }, 700);
   };
 
-  const handleListeningState = () => {
+  const handleListeningState = async () => {
     if (!currentUnit) return;
-    setTimeout(() => {
-      setPracticeState('ANSWER');
-    }, currentUnit.responseTime);
+    try {
+      timerRef.current = setTimeout(async () => {
+        timerRef.current = null;
+        const audioUri = await recordingService.stopRecording();
+        if (!isMounted.current) return;
+
+        updateState('ANSWER');
+
+        // Evaluar la respuesta
+        setIsEvaluating(true);
+        
+        // Crear FormData con el audio
+        const formData = new FormData();
+        formData.append('audio', {
+          uri: audioUri,
+          type: 'audio/m4a',
+          name: 'recording.m4a'
+        } as any);
+        try {
+          const result = await evaluateAnswer(sessionId, currentUnit.id, formData);
+          console.log('Result:', result);
+          setScore(result.score);
+          setAnswer(result.answer);
+          if (practiceStateRef.current === 'RESULT') handleResultState();
+        } catch (error) {
+          console.error('Error evaluating answer:', error);
+          setScore(1); // Fallback score en caso de error
+        } finally {
+          setIsEvaluating(false);
+        }
+      }, currentUnit.responseTime);
+    } catch (error) {
+      console.error('Error in listening state:', error);
+      updateState('ANSWER');
+    }
   };
 
   const handleAnswerState = async () => {
     if (!currentUnit) return;
-    // TODO: Implementar evaluación del audio
-    const mockScore = Math.floor(Math.random() * 4) + 1;
-    setScore(mockScore);
     await playText(currentUnit.answer.text, 'en');
-    setTimeout(() => {
-      setPracticeState('RESULT');
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      updateState('RESULT');
     }, 700);
   };
 
   const handleResultState = async () => {
     if (!currentUnit || !sessionId || !score) return;
     try {
-      const result = await submitResult(sessionId, currentUnit.id, score);
-      setCurrentUnit(result.nextUnit);
+      const result = await submitResult(sessionId, currentUnit.id, score, answer);
       setScore(undefined);
-      setPracticeState('QUESTION');
+      setAnswer(undefined);
+      setCurrentUnit(result.nextUnit);
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null;
+        updateState('QUESTION');
+      }, 700);
     } catch (error) {
       console.error('Error submitting result:', error);
     }
   };
 
   useEffect(() => {
-    console.log('practiceState', practiceState);
     switch (practiceState) {
       case 'QUESTION':
         handleQuestionState();
@@ -96,7 +164,9 @@ export default function PracticeScreen() {
     }
   }, [practiceState, currentUnit]);
 
-  const handleExit = () => {
+  const handleExit = async () => {
+    await recordingService.stopRecording();
+    await speechService.stop();
     router.back();
   };
 
@@ -121,20 +191,6 @@ export default function PracticeScreen() {
         <Text style={styles.exitText}>Salir</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.exitButton, { top: 60 }]} 
-        onPress={async () => {
-          console.log('Testing speech...');
-          try {
-            await playText('Hello', 'en');
-            console.log('Speech test completed');
-          } catch (error) {
-            console.error('Test error:', error);
-          }
-        }}>
-        <Text style={styles.exitText}>Test Audio</Text>
-      </TouchableOpacity>
-
       {currentUnit && (
         <View style={styles.content}>
           {practiceState === 'QUESTION' && (
@@ -145,6 +201,7 @@ export default function PracticeScreen() {
 
           {practiceState === 'LISTENING' && (
             <View style={styles.card}>
+              <View style={styles.recordingIndicator} />
               <Text style={styles.text}>Es tu turno, traduce la frase</Text>
             </View>
           )}
@@ -152,12 +209,26 @@ export default function PracticeScreen() {
           {practiceState === 'ANSWER' && (
             <View style={styles.card}>
               <Text style={styles.text}>{currentUnit.answer.text}</Text>
+              {isEvaluating && (
+                <View style={styles.evaluatingContainer}>
+                  <ActivityIndicator size="large" color="#2563EB" />
+                  <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
+                </View>
+              )}
             </View>
           )}
 
-          {practiceState === 'RESULT' && score && (
+          {practiceState === 'RESULT' && (
             <View style={styles.card}>
-              <Text style={styles.text}>{getScoreText(score)}</Text>
+              {score && (
+                <Text style={styles.text}>{getScoreText(score)}</Text>
+              )}
+              {isEvaluating && (
+                <View style={styles.evaluatingContainer}>
+                  <ActivityIndicator size="large" color="#2563EB" />
+                  <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -201,11 +272,28 @@ const styles = StyleSheet.create({
     elevation: 2,
     width: '100%',
     maxWidth: 480,
+    alignItems: 'center',
   },
   text: {
     fontSize: 20,
     color: '#1E293B',
     textAlign: 'center',
+    fontFamily: 'Inter',
+  },
+  recordingIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#EF4444',
+    marginBottom: 16,
+  },
+  evaluatingContainer: {
+    alignItems: 'center',
+  },
+  evaluatingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#64748B',
     fontFamily: 'Inter',
   },
 });

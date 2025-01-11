@@ -49,6 +49,7 @@ export async function submitResultService(
   await prisma.result.create({
     data: {
       score: request.score,
+      answer: request.answer,
       session: {
         connect: { id: sessionId },
       },

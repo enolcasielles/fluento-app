@@ -20,6 +20,7 @@ export interface GetListSessionResponse {
 
 export interface EvaluateAnswerResponse {
   score: number;
+  answer: string;
 }
 
 export interface SubmitResultResponse {

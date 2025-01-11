@@ -46,7 +46,9 @@ export async function evaluateAnswerService(
 
   const transcription = await audioToText(audioFile);
 
+  console.log(transcription);
+
   const score = await evaluateAnswer(unit.answerText, transcription);
 
-  return { score };
+  return { score, answer: transcription };
 }
