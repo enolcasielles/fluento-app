@@ -41,6 +41,14 @@ export default function Home() {
         label="Test Audio"
         onPress={() => playText('Mi nombre es Juan', 'es')}
       />
+      <Button
+        label="Go Practice"
+        onPress={() => router.push('/practice/61d0117e-03fa-471b-bb2f-ef71bac474f0')}
+      />
+      <Button
+        label="Test Audio"
+        onPress={() => router.push('/test')}
+      />
     </View>
   );
 }

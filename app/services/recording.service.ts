@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 
 let recording: Audio.Recording | null = null;
 
@@ -10,7 +10,6 @@ export const startRecording = async () => {
       allowsRecordingIOS: true,
       playsInSilentModeIOS: true,
     });
-
     console.log('Starting recording..');
     const { recording: newRecording } = await Audio.Recording.createAsync(
       Audio.RecordingOptionsPresets.HIGH_QUALITY
@@ -33,6 +32,10 @@ export const stopRecording = async (): Promise<string> => {
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     console.log('Recording stopped and stored at', uri);
+
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
 
     recording = null;
     return uri || '';

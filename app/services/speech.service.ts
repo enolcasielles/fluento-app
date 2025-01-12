@@ -1,3 +1,6 @@
+import { InterruptionModeAndroid } from 'expo-av';
+import { InterruptionModeIOS } from 'expo-av';
+import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 
 interface SpeakOptions {
@@ -7,6 +10,7 @@ interface SpeakOptions {
 }
 
 let availableVoices: Speech.Voice[] = [];
+let selectedVoicesForLanguage: { [key: string]: Speech.Voice | null } = {};
 
 const initVoices = async () => {
   if (availableVoices.length === 0) {
@@ -21,19 +25,25 @@ const initVoices = async () => {
 
 const findVoiceForLanguage = (language?: string) => {
   if (!language) return null;
+
+  if (selectedVoicesForLanguage[language]) {
+    return selectedVoicesForLanguage[language];
+  }
   
   // Primero intentamos encontrar una voz compact (son más estables en iOS)
-  const voice = availableVoices.find(v => 
+  let voice = availableVoices.find(v => 
     v.language.toLowerCase().startsWith(language.toLowerCase()) &&
     v.identifier.toLowerCase().includes('compact')
   );
 
   // Si no hay voces compact, usamos cualquier otra
   if (!voice) {
-    return availableVoices.find(v => 
+    voice = availableVoices.find(v => 
       v.language.toLowerCase().startsWith(language.toLowerCase())
     );
   }
+
+  selectedVoicesForLanguage[language] = voice;
 
   return voice;
 };
@@ -42,10 +52,11 @@ export const speak = async (text: string, options?: SpeakOptions) => {
   console.log('speaking', text, options);
   
   try {
+    // Configuramos el modo de audio antes de reproducir
     await initVoices();
     const voice = findVoiceForLanguage(options?.language);
     console.log('Selected voice:', voice);
-
+    
     if (!voice) {
       console.warn('No voice found for language:', options?.language);
     }
@@ -59,7 +70,7 @@ export const speak = async (text: string, options?: SpeakOptions) => {
         Speech.speak(text, {
           language: voice?.language || options?.language,
           voice: voice?.identifier,
-          rate: 0.5, // Reducimos la velocidad para mejorar la estabilidad con voces compact
+          rate: 1.0,
           pitch: 1.0,
           onStart: () => {
             console.log('Started speaking');
@@ -78,7 +89,7 @@ export const speak = async (text: string, options?: SpeakOptions) => {
             console.error('Error speaking:', error);
             clearTimeout(timeoutId);
             reject(error);
-          }
+          },
         });
       } catch (error) {
         clearTimeout(timeoutId);

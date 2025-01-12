@@ -6,8 +6,10 @@ import { useApiContext } from '@/contexts/api.context';
 import { Unit } from '@/types/session';
 import * as speechService from '@/services/speech.service';
 import * as recordingService from '@/services/recording.service';
+import { playScoreSound, playStartRecordingSound, playStopRecordingSound } from '@/services/audio.service';
+import { delay } from '@/utils/delay';
 
-type PracticeState = 'QUESTION' | 'LISTENING' | 'ANSWER' | 'RESULT';
+type PracticeState = 'INITING' | 'QUESTION' | 'LISTENING' | 'ANSWER' | 'WAITING_EVALUATION' | 'RESULT';
 
 export default function PracticeScreen() {
   const router = useRouter();
@@ -16,17 +18,22 @@ export default function PracticeScreen() {
 
   const [sessionId, setSessionId] = useState<string>();
   const [currentUnit, setCurrentUnit] = useState<Unit>();
-  const [practiceState, setPracticeState] = useState<PracticeState>('QUESTION');
+  const [practiceState, setPracticeState] = useState<PracticeState>('INITING');
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [score, setScore] = useState<number>();
   const [answer, setAnswer] = useState<string>();
   const isMounted = useRef(true);
+  const isEvaluatingRef = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const practiceStateRef = useRef<PracticeState>('QUESTION');
+  const practiceStateRef = useRef<PracticeState>('INITING');
 
   useEffect(() => {
     practiceStateRef.current = practiceState;
   }, [practiceState]);
+
+  useEffect(() => {
+    isEvaluatingRef.current = isEvaluating;
+  }, [isEvaluating]);
 
   useEffect(() => {
     loadSession();
@@ -41,6 +48,23 @@ export default function PracticeScreen() {
     }
   }, []);
 
+  useEffect(() => {
+    switch (practiceState) {
+      case 'QUESTION':
+        handleQuestionState();
+        break;
+      case 'LISTENING':
+        handleListeningState();
+        break;
+      case 'ANSWER':
+        handleAnswerState();
+        break;
+      case 'RESULT':
+        handleResultState();
+        break;
+    }
+  }, [practiceState]);
+
   const updateState = (state: PracticeState) => {
     if (!isMounted.current) return;
     setPracticeState(state);
@@ -51,6 +75,7 @@ export default function PracticeScreen() {
       const session = await getListSession(listId as string);
       setSessionId(session.sessionId);
       setCurrentUnit(session.nextUnit);
+      updateState('QUESTION');
     } catch (error) {
       console.error('Error loading session:', error);
     }
@@ -64,32 +89,27 @@ export default function PracticeScreen() {
     }
   };
 
-  const initRecording = async () => {
-    try {
-      if (!isMounted.current) return;
-      await recordingService.startRecording();
-      updateState('LISTENING');
-    } catch (error) {
-      console.error('Error initializing recording:', error);
-    }
-  }
-
   const handleQuestionState = async () => {
     if (!currentUnit) return;
     await playText(currentUnit.question.text, 'es');
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      initRecording();
+      updateState('LISTENING');
     }, 700);
   };
 
   const handleListeningState = async () => {
     if (!currentUnit) return;
     try {
+      await playStartRecordingSound();
+      await recordingService.startRecording();
+      if (!isMounted.current) return;
       timerRef.current = setTimeout(async () => {
         timerRef.current = null;
         const audioUri = await recordingService.stopRecording();
         if (!isMounted.current) return;
+
+        await playStopRecordingSound();
 
         updateState('ANSWER');
 
@@ -108,7 +128,9 @@ export default function PracticeScreen() {
           console.log('Result:', result);
           setScore(result.score);
           setAnswer(result.answer);
-          if (practiceStateRef.current === 'RESULT') handleResultState();
+          if (practiceStateRef.current === 'WAITING_EVALUATION') {
+            updateState('RESULT');
+          }
         } catch (error) {
           console.error('Error evaluating answer:', error);
           setScore(1); // Fallback score en caso de error
@@ -127,13 +149,15 @@ export default function PracticeScreen() {
     await playText(currentUnit.answer.text, 'en');
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      updateState('RESULT');
+      if (isEvaluatingRef.current) updateState('WAITING_EVALUATION');
+      else updateState('RESULT');
     }, 700);
   };
 
   const handleResultState = async () => {
     if (!currentUnit || !sessionId || !score) return;
     try {
+      playScoreSound(score);
       const result = await submitResult(sessionId, currentUnit.id, score, answer);
       setScore(undefined);
       setAnswer(undefined);
@@ -146,23 +170,6 @@ export default function PracticeScreen() {
       console.error('Error submitting result:', error);
     }
   };
-
-  useEffect(() => {
-    switch (practiceState) {
-      case 'QUESTION':
-        handleQuestionState();
-        break;
-      case 'LISTENING':
-        handleListeningState();
-        break;
-      case 'ANSWER':
-        handleAnswerState();
-        break;
-      case 'RESULT':
-        handleResultState();
-        break;
-    }
-  }, [practiceState, currentUnit]);
 
   const handleExit = async () => {
     await recordingService.stopRecording();
@@ -218,17 +225,18 @@ export default function PracticeScreen() {
             </View>
           )}
 
+          {practiceState === 'WAITING_EVALUATION' && (
+            <View style={styles.card}>
+              <View style={styles.evaluatingContainer}>
+                <ActivityIndicator size="large" color="#2563EB" />
+                <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
+              </View>
+            </View>
+          )}
+
           {practiceState === 'RESULT' && (
             <View style={styles.card}>
-              {score && (
-                <Text style={styles.text}>{getScoreText(score)}</Text>
-              )}
-              {isEvaluating && (
-                <View style={styles.evaluatingContainer}>
-                  <ActivityIndicator size="large" color="#2563EB" />
-                  <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
-                </View>
-              )}
+              <Text style={styles.text}>{getScoreText(score)}</Text>
             </View>
           )}
         </View>
