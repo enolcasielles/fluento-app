@@ -9,8 +9,8 @@ import { CustomError } from '@/utils/custom-error';
 import { ListDetail } from '@/types/list-detail';
 import { CreationStatus } from '@/enums/creation-status.enum';
 import Svg, { Path } from 'react-native-svg';
-import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 import { BUTTON_HEIGHT } from '@/components/base/Button';
+import { useFetch } from '@/hooks/useFetch';
 
 const FOOTER_HEIGHT = spacing.lg + BUTTON_HEIGHT + spacing.lg
 
@@ -31,25 +31,15 @@ export default function ListDetailScreen() {
   const { showError } = useError();
   const { getListDetail, saveList, deleteSavedList, retryCreateList } = useApiContext();
   const [list, setList] = useState<ListDetail>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
-  useEffect(() => {
-    fetchListDetail();
-  }, [id]);
-
-  const fetchListDetail = async () => {
-    try {
-      setIsLoading(true);
+  const { isLoading, refetch } = useFetch({
+    action: async () => {
       const data = await getListDetail(id as string);
       setList(data);
-    } catch (error) {
-      showError(error as CustomError);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   const handleToggleSave = async () => {
     if (!list) return;
@@ -78,7 +68,7 @@ export default function ListDetailScreen() {
     try {
       setIsRetrying(true);
       await retryCreateList(list.id);
-      await fetchListDetail();
+      refetch();
     } catch (error) {
       showError(error as CustomError);
     } finally {

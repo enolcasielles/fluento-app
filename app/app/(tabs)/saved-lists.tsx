@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { colors, spacing, typography } from '../../theme';
 import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
-import { useError } from '@/contexts/error.context';
-import { CustomError } from '@/utils/custom-error';
 import { SavedList } from '@/types/saved-list';
-import { Button } from '@/components/base/Button';
+import { useFetch } from '@/hooks/useFetch';
 
 const EmptyState = () => (
   <View style={styles.emptyContainer}>
@@ -20,32 +18,15 @@ const EmptyState = () => (
 
 export default function SavedLists() {
   const router = useRouter();
-  const { showError } = useError();
   const { getSavedLists } = useApiContext();
   const [lists, setLists] = useState<SavedList[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  const fetchSavedLists = async () => {
-    try {
-      if (isInitialLoading) {
-        setIsInitialLoading(false);
-        setIsLoading(true);
-      }
+  const { isLoading } = useFetch({
+    action: async () => {
       const data = await getSavedLists();
       setLists(data.lists);
-    } catch (error) {
-      showError(error as CustomError);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchSavedLists();
-    }, [isInitialLoading])
-  );
+    },
+  });
 
   if (isLoading) {
     return (
@@ -70,7 +51,6 @@ export default function SavedLists() {
           description={item.description}
           image={item.imageUrl}
           difficultyLabel={item.difficultyLabel}
-          statusLabel={item.creationStatusLabel}
           onPress={() => router.push(`/lists/${item.id}`)}
         />
       )}

@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useApiContext } from '@/contexts/api.context';
 import { Unit } from '@/types/session';
 import * as speechService from '@/services/speech.service';
 import * as recordingService from '@/services/recording.service';
 import { playScoreSound, playStartRecordingSound, playStopRecordingSound } from '@/services/audio.service';
-import { delay } from '@/utils/delay';
+import { QuestionState, ListeningState, AnswerState, ResultState } from '@/components/sections/practice';
+import { colors } from '@/theme/colors';
+import { spacing, borderRadius } from '@/theme/spacing';
+import { typography } from '@/theme/typography';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 
 type PracticeState = 'INITING' | 'QUESTION' | 'LISTENING' | 'ANSWER' | 'WAITING_EVALUATION' | 'RESULT';
 
@@ -193,84 +198,70 @@ export default function PracticeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.exitButton} onPress={handleExit}>
-        <Text style={styles.exitText}>Salir</Text>
-      </TouchableOpacity>
+    <ScreenContainer>
+      <View style={styles.container}>
+        <TouchableOpacity 
+          style={styles.exitButton}
+          onPress={handleExit}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="close-circle" size={24} color={colors.textSecondary} />
+          <Text style={styles.exitText}>Finalizar práctica</Text>
+        </TouchableOpacity>
 
-      {currentUnit && (
-        <View style={styles.content}>
-          {practiceState === 'QUESTION' && (
-            <View style={styles.card}>
-              <Text style={styles.text}>{currentUnit.question.text}</Text>
-            </View>
-          )}
+        {currentUnit && (
+          <View style={styles.content}>
+            {practiceState === 'QUESTION' && (
+              <QuestionState text={currentUnit.question.text} />
+            )}
 
-          {practiceState === 'LISTENING' && (
-            <View style={styles.card}>
-              <View style={styles.recordingIndicator} />
-              <Text style={styles.text}>Es tu turno, traduce la frase</Text>
-            </View>
-          )}
+            {practiceState === 'LISTENING' && (
+              <ListeningState remainingTime={currentUnit.responseTime} />
+            )}
 
-          {practiceState === 'ANSWER' && (
-            <View style={styles.card}>
-              <Text style={styles.text}>{currentUnit.answer.text}</Text>
-              {isEvaluating && (
-                <View style={styles.evaluatingContainer}>
-                  <ActivityIndicator size="large" color="#2563EB" />
-                  <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
-                </View>
-              )}
-            </View>
-          )}
+            {practiceState === 'ANSWER' && (
+              <AnswerState 
+                text={currentUnit.answer.text} 
+                isEvaluating={isEvaluating} 
+              />
+            )}
 
-          {practiceState === 'WAITING_EVALUATION' && (
-            <View style={styles.card}>
-              <View style={styles.evaluatingContainer}>
-                <ActivityIndicator size="large" color="#2563EB" />
-                <Text style={styles.evaluatingText}>Evaluando respuesta...</Text>
-              </View>
-            </View>
-          )}
+            {practiceState === 'WAITING_EVALUATION' && (
+              <AnswerState 
+                text={currentUnit.answer.text} 
+                isEvaluating={true} 
+              />
+            )}
 
-          {practiceState === 'RESULT' && (
-            <View style={styles.card}>
-              <Text style={styles.text}>{getScoreText(score)}</Text>
-            </View>
-          )}
-        </View>
-      )}
-    </View>
+            {practiceState === 'RESULT' && score && (
+              <ResultState score={score} />
+            )}
+          </View>
+        )}
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
-    padding: 16,
-  },
+    backgroundColor: colors.background,
+    padding: spacing.md,
+  } as ViewStyle,
   exitButton: {
     position: 'absolute',
-    top: 16,
-    left: 16,
+    top: spacing.lg,
+    left: spacing.md,
     zIndex: 1,
-  },
-  exitText: {
-    fontSize: 16,
-    color: '#64748B',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    borderRadius: 12,
-    shadowColor: '#000',
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.large,
+    gap: spacing.xs,
+    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -278,30 +269,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    width: '100%',
-    maxWidth: 480,
+  } as ViewStyle,
+  exitText: {
+    ...typography.bodyLarge,
+    color: colors.textSecondary,
+    fontWeight: typography.medium,
+  } as TextStyle,
+  content: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  text: {
-    fontSize: 20,
-    color: '#1E293B',
-    textAlign: 'center',
-    fontFamily: 'Inter',
-  },
-  recordingIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#EF4444',
-    marginBottom: 16,
-  },
-  evaluatingContainer: {
-    alignItems: 'center',
-  },
-  evaluatingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#64748B',
-    fontFamily: 'Inter',
-  },
+  } as ViewStyle,
 });

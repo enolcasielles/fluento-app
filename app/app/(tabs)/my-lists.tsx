@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { colors, spacing, typography } from '../../theme';
 import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
-import { useError } from '@/contexts/error.context';
-import { CustomError } from '@/utils/custom-error';
 import { Button } from '@/components/base/Button';
 import { MyList } from '@/types/my-lists';
+import { useFetch } from '@/hooks/useFetch';
 
 const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   <View style={styles.emptyContainer}>
@@ -26,32 +25,15 @@ const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
 
 export default function MyLists() {
   const router = useRouter();
-  const { showError } = useError();
   const { getMyLists } = useApiContext();
   const [lists, setLists] = useState<MyList[]>([]);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchMyLists = async () => {
-    try {
-      if (isInitialLoading) {
-        setIsInitialLoading(false);
-        setIsLoading(true);
-      }
+  
+  const { isLoading } = useFetch({
+    action: async () => {
       const data = await getMyLists();
       setLists(data.lists);
-    } catch (error) {
-      showError(error as CustomError);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchMyLists();
-    }, [isInitialLoading])
-  );
+    },
+  });
 
   const handleCreateList = () => {
     router.push('/create');

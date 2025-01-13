@@ -6,6 +6,7 @@ import { ErrorModal } from "@/components/modals/ErrorModal";
 import { ErrorProvider } from "@/contexts/error.context";
 import { ApiProvider } from "@/contexts/api.context";
 import { AuthContextProvider } from "@/contexts/auth.context";
+import PracticeScreen from "./practice/[listId]";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -58,6 +59,12 @@ export default function RootLayout() {
                 />
                 <Stack.Screen
                   name="(tabs)"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="practice/[listId]"
                   options={{
                     headerShown: false,
                   }}

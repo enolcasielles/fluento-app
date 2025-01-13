@@ -53,14 +53,6 @@ export default function TabsLayout() {
           headerTitle: 'Listas Guardadas',
         }}
       />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Perfil',
-          tabBarLabel: 'Perfil',
-          headerTitle: 'Mi Perfil',
-        }}
-      />
     </Tabs>
   );
 } 
