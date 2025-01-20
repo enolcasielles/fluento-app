@@ -29,25 +29,19 @@ export default function Home() {
       />
       <Button
         label="Iniciar Sesión"
-        variant="secondary"
         onPress={() => router.push('/login')}
-      />
-      <Button
-        label="Explorar Listas"
-        variant="outline"
-        onPress={() => router.push('/(tabs)/explore')}
-      />
-      <Button
-        label="Test Audio"
-        onPress={() => playText('Mi nombre es Juan', 'es')}
       />
       <Button
         label="Go Practice"
         onPress={() => router.push('/practice/61d0117e-03fa-471b-bb2f-ef71bac474f0')}
       />
       <Button
-        label="Test Audio"
+        label="Test Page"
         onPress={() => router.push('/test')}
+      />
+      <Button
+        label="Onboarding"
+        onPress={() => router.push('/onboarding')}
       />
     </View>
   );
