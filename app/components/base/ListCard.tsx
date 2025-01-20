@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
-    marginHorizontal: spacing.xs,
     marginVertical: spacing.xs,
     shadowColor: colors.shadow,
     shadowOffset: {

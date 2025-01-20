@@ -7,6 +7,17 @@ import { useApiContext } from '@/contexts/api.context';
 import { Button } from '@/components/base/Button';
 import { MyList } from '@/types/my-lists';
 import { useFetch } from '@/hooks/useFetch';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
+import Svg, { Path } from 'react-native-svg';
+
+const PlusIcon = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+      fill={colors.primary}
+    />
+  </Svg>
+);
 
 const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   <View style={styles.emptyContainer}>
@@ -36,7 +47,7 @@ export default function MyLists() {
   });
 
   const handleCreateList = () => {
-    router.push('/create');
+    router.push('/lists/create');
   };
 
   if (isLoading) {
@@ -52,7 +63,23 @@ export default function MyLists() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenContainer>
+      <View style={styles.header}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Mis Listas</Text>
+          <View style={styles.createButton}>
+            <Button
+              variant="icon"
+              icon={<PlusIcon />}
+              label=""
+              onPress={() => router.push('/lists/create')}
+            />
+          </View>
+        </View>
+        <Text style={styles.description}>
+          Aquí podrás ver todas las listas que has creado.
+        </Text>
+      </View>
       <FlatList
         data={lists}
         style={styles.list}
@@ -70,7 +97,7 @@ export default function MyLists() {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </ScreenContainer>
   );
 }
 
@@ -79,11 +106,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: typography.h1.fontSize,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
+  },
+  createButton: {
+    marginRight: -spacing.md,
+  },
+  description: {
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+    lineHeight: typography.body.fontSize * 1.5,
+  },
   list: {
     flex: 1,
   },
   content: {
     padding: spacing.lg,
+    paddingTop: 0,
     gap: spacing.md,
   },
   loadingContainer: {

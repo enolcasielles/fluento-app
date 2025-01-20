@@ -6,6 +6,7 @@ import { ListCard } from '../../components/base/ListCard';
 import { useApiContext } from '@/contexts/api.context';
 import { SavedList } from '@/types/saved-list';
 import { useFetch } from '@/hooks/useFetch';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 
 const EmptyState = () => (
   <View style={styles.emptyContainer}>
@@ -41,22 +42,30 @@ export default function SavedLists() {
   }
 
   return (
-    <FlatList
-      data={lists}
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      renderItem={({ item }) => (
-        <ListCard
-          title={item.name}
-          description={item.description}
-          image={item.imageUrl}
-          difficultyLabel={item.difficultyLabel}
-          onPress={() => router.push(`/lists/${item.id}`)}
-        />
-      )}
-      keyExtractor={(item) => item.id}
-      showsVerticalScrollIndicator={false}
-    />
+    <ScreenContainer>
+      <View style={styles.header}>
+        <Text style={styles.title}>Listas Guardadas</Text>
+        <Text style={styles.description}>
+          Aquí podrás ver todas las listas que has guardado.
+        </Text>
+      </View>
+      <FlatList
+        data={lists}
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        renderItem={({ item }) => (
+          <ListCard
+            title={item.name}
+            description={item.description}
+            image={item.imageUrl}
+            difficultyLabel={item.difficultyLabel}
+            onPress={() => router.push(`/lists/${item.id}`)}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+      />
+    </ScreenContainer>
   );
 }
 
@@ -65,8 +74,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  title: {
+    fontSize: typography.h1.fontSize,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
+  },
+  description: {
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+    lineHeight: typography.body.fontSize * 1.5,
+  },
   content: {
     padding: spacing.lg,
+    paddingTop: 0,
     gap: spacing.md,
   },
   loadingContainer: {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import {
   View,
   Text,
@@ -35,7 +35,7 @@ const ChevronIcon = () => (
   </Svg>
 );
 
-export const Select: React.FC<SelectProps> = ({
+export const Select = forwardRef<View, SelectProps>(({
   label,
   value,
   onChange,
@@ -43,7 +43,7 @@ export const Select: React.FC<SelectProps> = ({
   error,
   placeholder = 'Selecciona una opción',
   disabled = false,
-}) => {
+}, ref) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOption = options.find(option => option.value === value);
@@ -63,6 +63,7 @@ export const Select: React.FC<SelectProps> = ({
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity
+        ref={ref}
         style={[
           styles.select,
           {
@@ -125,7 +126,7 @@ export const Select: React.FC<SelectProps> = ({
       </Modal>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

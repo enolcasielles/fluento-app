@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '../../theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text' | 'icon';
 
 export const BUTTON_HEIGHT = 48;
 
@@ -32,6 +32,8 @@ export const Button: React.FC<ButtonProps> = ({
         return colors.secondary;
       case 'outline':
       case 'text':
+        return 'transparent';
+      case 'icon':
         return 'transparent';
       default:
         return colors.primary;
@@ -82,7 +84,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <View style={styles.content}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
-          <Text style={[styles.label, { color: getTextColor() }]}>{label}</Text>
+          {variant !== 'icon' && <Text style={[styles.label, { color: getTextColor() }]}>{label}</Text>}
         </View>
       )}
     </TouchableOpacity>

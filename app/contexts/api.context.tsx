@@ -19,6 +19,7 @@ import {
   EvaluateAnswerResponse, 
   SubmitResultResponse 
 } from '@/types/session';
+import { Difficulty } from '@/enums/difficulty.enum';
 
 interface ApiContextType {
   getUserProfile: () => Promise<User>;
@@ -151,7 +152,7 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
   const createList = async (data: {
     name: string;
     topic: string;
-    difficulty: 'any' | 'beginner' | 'intermediate' | 'advanced';
+    difficulty: Difficulty;
     grammarStructures: string;
   }) => {
     return executeRequest({

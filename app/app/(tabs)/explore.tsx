@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { CategorySection } from '../../components/base/CategorySection';
 import { useApiContext } from '@/contexts/api.context';
 import { ExploreCategory } from '@/types/explore';
 import { useFetch } from '@/hooks/useFetch';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 
 export default function Explore() {
   const router = useRouter();
@@ -28,20 +29,28 @@ export default function Explore() {
   }
 
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {categories.map((category) => (
-        <CategorySection
-          key={category.id}
-          title={category.name}
-          lists={category.lists}
-          onListPress={(list) => router.push(`/lists/${list.id}`)}
-        />
-      ))}
-    </ScrollView>
+    <ScreenContainer>
+      <View style={styles.header}>
+        <Text style={styles.title}>Explorar</Text>
+        <Text style={styles.description}>
+          Explora las listas que hemos creado para tí. Practica con aquellas que te interesen.
+        </Text>
+      </View>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {categories.map((category) => (
+          <CategorySection
+            key={category.id}
+            title={category.name}
+            lists={category.lists}
+            onListPress={(list) => router.push(`/lists/${list.id}`)}
+          />
+        ))}
+      </ScrollView>
+    </ScreenContainer>
   );
 }
 
@@ -50,8 +59,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  title: {
+    fontSize: typography.h1.fontSize,
+    fontWeight: typography.semibold,
+    color: colors.textPrimary,
+  },
+  description: {
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+    lineHeight: typography.body.fontSize * 1.5,
+  },
   content: {
     paddingVertical: spacing.lg,
+    paddingTop: 0,
   },
   loadingContainer: {
     flex: 1,

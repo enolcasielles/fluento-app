@@ -11,6 +11,7 @@ import { CreationStatus } from '@/enums/creation-status.enum';
 import Svg, { Path } from 'react-native-svg';
 import { BUTTON_HEIGHT } from '@/components/base/Button';
 import { useFetch } from '@/hooks/useFetch';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 
 const FOOTER_HEIGHT = spacing.lg + BUTTON_HEIGHT + spacing.lg
 
@@ -21,6 +22,15 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
       fill={filled ? colors.error : 'none'}
       stroke={filled ? colors.error : colors.textSecondary}
       strokeWidth={2}
+    />
+  </Svg>
+);
+
+const BackIcon = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z"
+      fill={colors.background}
     />
   </Svg>
 );
@@ -92,10 +102,17 @@ export default function ListDetailScreen() {
   if (!list) return null;
 
   return (
-      <View style={styles.container}>
+    <ScreenContainer>
         <ScrollView style={styles.scrollView}>
           <View style={styles.imageContainer}>
             <Image source={{ uri: list.imageUrl }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <BackIcon />
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.saveButton}
               onPress={handleToggleSave}
@@ -173,10 +190,10 @@ export default function ListDetailScreen() {
         <View style={styles.footer}>
           <Button
             label="Practicar"
-            onPress={handlePractice}
-          />
-        </View>
+          onPress={handlePractice}
+        />
       </View>
+    </ScreenContainer>
   );
 }
 
@@ -229,6 +246,25 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     backgroundColor: colors.surface,
+  },
+  backButton: {
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.lg,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   saveButton: {
     position: 'absolute',

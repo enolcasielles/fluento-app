@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import React, { useState, RefObject, forwardRef } from 'react';
+import { View, TextInput, Text, StyleSheet, ReturnKeyTypeOptions } from 'react-native';
 import { colors, spacing, typography, dimensions, borders } from '../../theme';
 
 type TextFieldType = 'text' | 'email' | 'password';
@@ -12,9 +12,12 @@ interface TextFieldProps {
   placeholder?: string;
   type?: TextFieldType;
   disabled?: boolean;
+  returnKeyType?: ReturnKeyTypeOptions;
+  nextFieldRef?: RefObject<TextInput>;
+  onSubmit?: () => void;
 }
 
-export const TextField: React.FC<TextFieldProps> = ({
+export const TextField = forwardRef<TextInput, TextFieldProps>(({
   label,
   value,
   onChange,
@@ -22,7 +25,10 @@ export const TextField: React.FC<TextFieldProps> = ({
   placeholder,
   type = 'text',
   disabled = false,
-}) => {
+  returnKeyType = 'default',
+  nextFieldRef,
+  onSubmit,
+}, ref) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const getBorderColor = () => {
@@ -31,10 +37,20 @@ export const TextField: React.FC<TextFieldProps> = ({
     return colors.border;
   };
 
+  const handleSubmitEditing = () => {
+    if (returnKeyType === 'next' && nextFieldRef?.current) {
+      nextFieldRef.current.focus();
+    }
+    if (returnKeyType === 'send' && onSubmit) {
+      onSubmit();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
+        ref={ref}
         style={[
           styles.input,
           {
@@ -54,11 +70,13 @@ export const TextField: React.FC<TextFieldProps> = ({
         editable={!disabled}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        returnKeyType={returnKeyType}
+        onSubmitEditing={handleSubmitEditing}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
