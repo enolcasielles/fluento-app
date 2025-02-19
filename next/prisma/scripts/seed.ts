@@ -102,6 +102,7 @@ async function main() {
               where: { listId: lista1.id },
             }))!.id,
             userId: user2.id,
+            answer: "NO_ANSWER",
           },
         ],
       },

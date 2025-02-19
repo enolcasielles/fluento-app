@@ -11,7 +11,7 @@ export const SubmitResultRequestSchema = z.object({
   score: z
     .number()
     .min(1, "La puntuación debe ser al menos 1")
-    .max(4, "La puntuación no puede ser mayor a 4")
+    .max(3, "La puntuación no puede ser mayor a 3")
     .int("La puntuación debe ser un número entero"),
   answer: z.string().min(1, "La respuesta no puede estar vacía").optional(),
 });

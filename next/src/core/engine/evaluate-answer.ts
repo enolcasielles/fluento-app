@@ -9,12 +9,11 @@ export async function evaluateAnswer(
     const prompt = `
     Eres un profesor de idiomas experto. El alumno debe traducir una frase del español al inglés. Tu objetivo es evaluar dicha respuesta, usando el siguiente criterio: 
     
-    1 = Muy incorrecta (significado muy diferente o respuesta incomprensible)
-    2 = Parcialmente incorrecta (tiene algunos elementos correctos pero con errores importantes)
-    3 = Mayormente correcta (pequeños errores pero mantiene el significado)
-    4 = Muy correcta (igual significado, pueden existir pequeñas variaciones gramaticales)
+    1 = Incorrecta (significado muy diferente o respuesta incomprensible)
+    2 = Parcialmente correcta (tiene errores pero mantiene parte del significado)
+    3 = Correcta (igual significado, pueden existir pequeñas variaciones)
     
-    Responde únicamente con el número de la evaluación (1, 2, 3 o 4).
+    Responde únicamente con el número de la evaluación (1, 2, 3).
 
     --------------------
 
@@ -33,7 +32,7 @@ export async function evaluateAnswer(
       completion.choices[0].message.content?.trim() ?? "0",
     );
 
-    if (score >= 1 && score <= 4) {
+    if (score >= 1 && score <= 3) {
       return score;
     }
 
