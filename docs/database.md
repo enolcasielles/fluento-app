@@ -87,7 +87,7 @@ El modelo de base de datos de Fluento está diseñado para gestionar usuarios, l
 | Atributo        | Tipo     | Descripción                                      |
 |------------------|----------|--------------------------------------------------|
 | id               | String   | Identificador único del resultado                 |
-| score            | Int      | Puntuación obtenida (1-4)                        |
+| score            | Int      | Puntuación obtenida (1-3)                        |
 | createdAt        | DateTime | Fecha de creación del resultado                   |
 
 **Relaciones:**

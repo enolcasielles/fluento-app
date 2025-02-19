@@ -170,7 +170,7 @@ Este documento detalla todos los componentes base necesarios para construir las 
 ### ScoreIndicator
 - **Uso**: Mostrar puntuación
 - **Propiedades**:
-  - `score`: 1 | 2 | 3 | 4
+  - `score`: 1 | 2 | 3
   - `animate`: boolean
 - **Estilo**:
   - Tamaño: lg

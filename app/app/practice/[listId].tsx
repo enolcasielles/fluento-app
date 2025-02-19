@@ -207,21 +207,6 @@ export default function PracticeScreen() {
     router.back();
   };
 
-  const getScoreText = (score: number) => {
-    switch (score) {
-      case 1:
-        return 'Necesitas practicar más';
-      case 2:
-        return 'Puedes mejorar';
-      case 3:
-        return '¡Muy bien!';
-      case 4:
-        return '¡Perfecto!';
-      default:
-        return '';
-    }
-  };
-
   return (
     <ScreenContainer>
       <View style={styles.container}>

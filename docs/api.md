@@ -190,7 +190,7 @@
    - Response 200:
      ```json
      {
-       "score": "number" // 1-4
+       "score": "number" // 1-3
      }
      ```
 
@@ -204,7 +204,7 @@
       - body:
         ```json
         {
-          "score": "number" // 1-4
+          "score": "number" // 1-3
         }
         ```
     - Response 200:

@@ -18,27 +18,15 @@ const getScoreConfig = (score: number) => {
       };
     case 2:
       return {
-        icon: '🤔',
+        icon: '😐',
         text: 'Puedes mejorar',
         color: colors.warning,
       };
     case 3:
       return {
-        icon: '😊',
-        text: '¡Muy bien!',
-        color: colors.info,
-      };
-    case 4:
-      return {
         icon: '🎉',
-        text: '¡Perfecto!',
+        text: '¡Muy bien!',
         color: colors.success,
-      };
-    default:
-      return {
-        icon: '😕',
-        text: 'Necesitas practicar más',
-        color: colors.error,
       };
   }
 };
@@ -85,7 +73,7 @@ export const ResultState = ({ score }: Props) => {
             <Text style={styles.scoreText}>Puntuación</Text>
             <View style={[styles.score, { backgroundColor: config.color }]}>
               <Text style={styles.scoreNumber}>{score}</Text>
-              <Text style={styles.scoreMax}>/4</Text>
+              <Text style={styles.scoreMax}>/3</Text>
             </View>
           </View>
         </Animated.View>
