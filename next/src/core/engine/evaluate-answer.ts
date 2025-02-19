@@ -7,23 +7,24 @@ export async function evaluateAnswer(
 ): Promise<number> {
   try {
     const prompt = `
-    Eres un profesor de idiomas experto. Compara las siguientes dos respuestas y evalúa qué tan similar es la respuesta del usuario a la respuesta correcta.
+    Eres un profesor de idiomas experto. El alumno debe traducir una frase del español al inglés. Tu objetivo es evaluar dicha respuesta, usando el siguiente criterio: 
     
-    Respuesta correcta: "${answerText}"
-    Respuesta del usuario: "${userResponse}"
-    
-    Evalúa la similitud en una escala del 1 al 4, donde:
     1 = Muy incorrecta (significado muy diferente o respuesta incomprensible)
     2 = Parcialmente incorrecta (tiene algunos elementos correctos pero con errores importantes)
     3 = Mayormente correcta (pequeños errores pero mantiene el significado)
     4 = Muy correcta (igual significado, pueden existir pequeñas variaciones gramaticales)
     
     Responde únicamente con el número de la evaluación (1, 2, 3 o 4).
+
+    --------------------
+
+    Respuesta esperada: "${answerText}"
+    Respuesta del usuario: "${userResponse}"
     `;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       temperature: 0.3,
       max_tokens: 5,
     });

@@ -3,6 +3,7 @@ import { SubmitResultRequest } from "../requests/SubmitResultRequest";
 import { SubmitResultResponse } from "../responses/SubmitResultResponse";
 import { CustomError } from "@/core/errors";
 import { generateNextUnit } from "@/core/engine/generate-next-unit";
+import { NO_ANSWER } from "@/core/constants/constants";
 
 export async function submitResultService(
   sessionId: string,
@@ -49,7 +50,7 @@ export async function submitResultService(
   await prisma.result.create({
     data: {
       score: request.score,
-      answer: request.answer,
+      answer: request.answer ?? NO_ANSWER,
       session: {
         connect: { id: sessionId },
       },

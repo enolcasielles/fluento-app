@@ -4,7 +4,7 @@ import { z, ZodError } from "zod";
 
 export interface SubmitResultRequest {
   score: number;
-  answer: string;
+  answer?: string;
 }
 
 export const SubmitResultRequestSchema = z.object({
@@ -13,7 +13,7 @@ export const SubmitResultRequestSchema = z.object({
     .min(1, "La puntuación debe ser al menos 1")
     .max(4, "La puntuación no puede ser mayor a 4")
     .int("La puntuación debe ser un número entero"),
-  answer: z.string().min(1, "La respuesta no puede estar vacía"),
+  answer: z.string().min(1, "La respuesta no puede estar vacía").optional(),
 });
 
 export function validateSubmitResultRequest(data: unknown) {

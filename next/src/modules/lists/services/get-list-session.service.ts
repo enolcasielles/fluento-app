@@ -7,6 +7,17 @@ export async function getListSessionService(
   listId: string,
   userId: string,
 ): Promise<GetListSessionResponse> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new CustomError({
+      message: "El usuario no existe",
+      statusCode: 404,
+    });
+  }
+
   const list = await prisma.list.findUnique({
     where: { id: listId },
   });
@@ -48,6 +59,8 @@ export async function getListSessionService(
     sessionId: session.id,
     listId: list.id,
     listName: list.name,
+    //evaluationMode: user.isPremium ? "auto" : "manual",
+    evaluationMode: "manual",
     nextUnit: {
       id: nextUnit.id,
       answer: {

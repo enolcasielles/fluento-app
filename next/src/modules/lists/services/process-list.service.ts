@@ -1,12 +1,13 @@
 import { prisma } from "@/core/lib/prisma";
 import { CustomError } from "@/core/errors";
-import { generateUnits } from "@/core/engine/units-generator";
 import { CreationStatus } from "@/core/enums/creation-status.enum";
 import { Difficulty } from "@/core/enums/difficulty.enum";
 import { calculateResponseTime } from "@/core/engine/calculate-response-time";
 import { List } from "@prisma/client";
+import { generateListImage } from "@/core/engine/generate-list-image";
+import { listGenerator } from "@/core/engine/list-generator";
 
-export async function generateListUnitsService(
+export async function processListService(
   listId: string,
   userId: string,
 ): Promise<List> {
@@ -37,8 +38,22 @@ export async function generateListUnitsService(
       },
     });
 
+    if (!list.imageUrl) {
+      try {
+        const imageUrl = await generateListImage({
+          topic: list.topic,
+        });
+        await prisma.list.update({
+          where: { id: listId },
+          data: {
+            imageUrl,
+          },
+        });
+      } catch (error) {}
+    }
+
     try {
-      const units = await generateUnits({
+      const { units, description } = await listGenerator({
         difficulty: list.difficulty as Difficulty,
         topic: list.topic,
         grammarStructures: list.grammarStructures,
@@ -91,6 +106,7 @@ export async function generateListUnitsService(
         where: { id: listId },
         data: {
           creationStatus: CreationStatus.COMPLETED,
+          description,
         },
       });
 

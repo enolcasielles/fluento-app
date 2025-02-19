@@ -3,11 +3,11 @@ import { CreateListRequest } from "../requests/CreateListRequest";
 import { CreateListResponse } from "../responses/CreateListResponse";
 import { CustomError } from "@/core/errors";
 import { Difficulty, DifficultyLabels } from "@/core/enums/difficulty.enum";
-import { generateListUnitsService } from "./generate-list-units.service";
 import {
   CreationStatus,
   CreationStatusLabels,
 } from "@/core/enums/creation-status.enum";
+import { processListService } from "./process-list.service";
 
 export async function createListService(
   userId: string,
@@ -39,7 +39,7 @@ export async function createListService(
   });
 
   //TODO: Migrar a un job
-  const updatedList = await generateListUnitsService(list.id, userId);
+  const updatedList = await processListService(list.id, userId);
 
   return {
     id: updatedList.id,

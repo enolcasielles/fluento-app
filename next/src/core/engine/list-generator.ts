@@ -10,11 +10,14 @@ interface Props {
 }
 
 interface Response {
-  questionText: string;
-  answerText: string;
+  units: {
+    questionText: string;
+    answerText: string;
+  }[];
+  description: string;
 }
 
-export async function generateUnits(props: Props): Promise<Response[]> {
+export async function listGenerator(props: Props): Promise<Response> {
   try {
     const {
       difficulty,
@@ -24,7 +27,7 @@ export async function generateUnits(props: Props): Promise<Response[]> {
     } = props;
 
     const prompt = `
-    Actúa como un profesor de inglés experto. Genera ${numberOfUnits} pares de frases para practicar inglés utilizando la metodología de traducción de Español a Inglés.
+    Actúa como un profesor de inglés experto. Tu objetivo es generar una lista de frasses que permitan al usuario practicar inglés utilizando la metodología de traducción de Español a Inglés. La lista debe contener exaxtamente ${numberOfUnits} pares de frases.
     
     Debes generar las frases cumpliendo los siguientes requisitos:
     - Nivel de dificultad: ${difficulty}. Posibles niveles: ${Object.values(Difficulty).join(", ")}
@@ -40,6 +43,12 @@ export async function generateUnits(props: Props): Promise<Response[]> {
     - Tener una longitud apropiada para el nivel
     - Enfocarse en el tema especificado
     - Utilizar las estructuras gramaticales indicadas
+
+    Por último, debes generar una descripción que represente esta lista de frases.
+
+    La descripción debe ser:
+    - Una frase breve, de entre 10 y 20 palabras, que resuma el contenido de la lista de frases.
+    - Que tenga un tono gracioso, amigable y entretenido.
     
     Responde en formato JSON con este esquema:
     {
@@ -48,7 +57,8 @@ export async function generateUnits(props: Props): Promise<Response[]> {
           "questionText": "Frase en español",
           "answerText": "Correct English translation"
         }
-      ]
+      ],
+      "description": "Descripción de la lista de frases"
     }
     `;
 
@@ -73,7 +83,7 @@ export async function generateUnits(props: Props): Promise<Response[]> {
       });
     }
 
-    return parsedResponse.units;
+    return parsedResponse;
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;

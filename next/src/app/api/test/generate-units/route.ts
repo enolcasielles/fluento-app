@@ -1,6 +1,6 @@
 import { apiError } from "@/core/api-responses/api-error";
 import { apiSuccess } from "@/core/api-responses/api-success";
-import { generateUnits } from "@/core/engine/units-generator";
+import { listGenerator } from "@/core/engine/list-generator";
 import { Difficulty } from "@/core/enums/difficulty.enum";
 import { CustomError } from "@/core/errors";
 
@@ -14,12 +14,12 @@ export async function GET() {
       });
     }
 
-    const units = await generateUnits({
+    const list = await listGenerator({
       difficulty: Difficulty.ADVANCED,
       numberOfUnits: 5,
     });
 
-    return apiSuccess(units);
+    return apiSuccess(list);
   } catch (error) {
     if (error instanceof CustomError) {
       return apiError(error);
