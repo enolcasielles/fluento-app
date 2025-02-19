@@ -153,7 +153,7 @@ export default function ListDetailScreen() {
             <View style={styles.infoSection}>
               <Text style={styles.sectionTitle}>Información</Text>
               <View style={styles.infoGrid}>
-                <InfoItem icon="DIFFICULTY" label="Dificultad" value={list.difficulty} />
+                <InfoItem icon="DIFFICULTY" label="Dificultad" value={list.difficultyLabel} />
                 <InfoItem icon="TOPIC" label="Temática" value={list.topic} />
                 <InfoItem icon="UNITS" label="Unidades" value={list.totalUnits.toString()} />
                 <InfoItem icon="GRAMMAR" label="Gramática" value={list.grammarStructures} />

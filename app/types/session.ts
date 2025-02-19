@@ -1,3 +1,5 @@
+export type EvaluationMode = 'auto' | 'manual';
+
 export interface Unit {
   id: string;
   question: {
@@ -16,6 +18,7 @@ export interface GetListSessionResponse {
   listId: string;
   listName: string;
   nextUnit: Unit;
+  evaluationMode: EvaluationMode;
 }
 
 export interface EvaluateAnswerResponse {

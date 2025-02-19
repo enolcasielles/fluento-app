@@ -4,17 +4,18 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useApiContext } from '@/contexts/api.context';
-import { Unit } from '@/types/session';
+import { Unit, EvaluationMode } from '@/types/session';
 import * as speechService from '@/services/speech.service';
 import * as recordingService from '@/services/recording.service';
 import { playScoreSound, playStartRecordingSound, playStopRecordingSound } from '@/services/audio.service';
 import { QuestionState, ListeningState, AnswerState, ResultState } from '@/components/sections/practice';
+import { ManualEvaluationState } from '@/components/sections/practice/ManualEvaluationState';
 import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 
-type PracticeState = 'INITING' | 'QUESTION' | 'LISTENING' | 'ANSWER' | 'WAITING_EVALUATION' | 'RESULT';
+type PracticeState = 'INITING' | 'QUESTION' | 'LISTENING' | 'ANSWER' | 'WAITING_EVALUATION' | 'RESULT' | 'MANUAL_EVALUATION';
 
 export default function PracticeScreen() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function PracticeScreen() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [score, setScore] = useState<number>();
   const [answer, setAnswer] = useState<string>();
+  const [evaluationMode, setEvaluationMode] = useState<EvaluationMode>('auto');
   const isMounted = useRef(true);
   const isEvaluatingRef = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -80,6 +82,7 @@ export default function PracticeScreen() {
       const session = await getListSession(listId as string);
       setSessionId(session.sessionId);
       setCurrentUnit(session.nextUnit);
+      setEvaluationMode(session.evaluationMode);
       updateState('QUESTION');
     } catch (error) {
       console.error('Error loading session:', error);
@@ -106,42 +109,55 @@ export default function PracticeScreen() {
   const handleListeningState = async () => {
     if (!currentUnit) return;
     try {
-      await playStartRecordingSound();
-      await recordingService.startRecording();
+      // Solo iniciamos grabación en modo auto
+      if (evaluationMode === 'auto') {
+        await playStartRecordingSound();
+        await recordingService.startRecording();
+      }
+      
       if (!isMounted.current) return;
       timerRef.current = setTimeout(async () => {
         timerRef.current = null;
-        const audioUri = await recordingService.stopRecording();
-        if (!isMounted.current) return;
 
-        await playStopRecordingSound();
+        // Solo paramos grabación y evaluamos en modo auto
+        if (evaluationMode === 'auto') {
+          const audioUri = await recordingService.stopRecording();
+          if (!isMounted.current) return;
+
+          await playStopRecordingSound();
+
+          // Evaluar la respuesta
+          setIsEvaluating(true);
+          
+          // Crear FormData con el audio
+          const formData = new FormData();
+          formData.append('audio', {
+            uri: audioUri,
+            type: 'audio/m4a',
+            name: 'recording.m4a'
+          } as any);
+          try {
+            const result = await evaluateAnswer(sessionId, currentUnit.id, formData);
+            console.log('Result:', result);
+            setScore(result.score);
+            setAnswer(result.answer);
+            if (practiceStateRef.current === 'WAITING_EVALUATION') {
+              updateState('RESULT');
+            }
+          } catch (error) {
+            console.error('Error evaluating answer:', error);
+            setScore(1); // Fallback score en caso de error
+          } finally {
+            setIsEvaluating(false);
+          }
+        }
+
+        else {
+          if (!isMounted.current) return;
+          await playStopRecordingSound();
+        }
 
         updateState('ANSWER');
-
-        // Evaluar la respuesta
-        setIsEvaluating(true);
-        
-        // Crear FormData con el audio
-        const formData = new FormData();
-        formData.append('audio', {
-          uri: audioUri,
-          type: 'audio/m4a',
-          name: 'recording.m4a'
-        } as any);
-        try {
-          const result = await evaluateAnswer(sessionId, currentUnit.id, formData);
-          console.log('Result:', result);
-          setScore(result.score);
-          setAnswer(result.answer);
-          if (practiceStateRef.current === 'WAITING_EVALUATION') {
-            updateState('RESULT');
-          }
-        } catch (error) {
-          console.error('Error evaluating answer:', error);
-          setScore(1); // Fallback score en caso de error
-        } finally {
-          setIsEvaluating(false);
-        }
       }, currentUnit.responseTime);
     } catch (error) {
       console.error('Error in listening state:', error);
@@ -154,9 +170,18 @@ export default function PracticeScreen() {
     await playText(currentUnit.answer.text, 'en');
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      if (isEvaluatingRef.current) updateState('WAITING_EVALUATION');
-      else updateState('RESULT');
+      if (evaluationMode === 'auto') {
+        if (isEvaluatingRef.current) updateState('WAITING_EVALUATION');
+        else updateState('RESULT');
+      } else {
+        updateState('MANUAL_EVALUATION');
+      }
     }, 700);
+  };
+
+  const handleManualScore = async (selectedScore: number) => {
+    setScore(selectedScore);
+    updateState('RESULT');
   };
 
   const handleResultState = async () => {
@@ -231,6 +256,10 @@ export default function PracticeScreen() {
                 text={currentUnit.answer.text} 
                 isEvaluating={true} 
               />
+            )}
+
+            {practiceState === 'MANUAL_EVALUATION' && (
+              <ManualEvaluationState onSelectScore={handleManualScore} />
             )}
 
             {practiceState === 'RESULT' && score && (
