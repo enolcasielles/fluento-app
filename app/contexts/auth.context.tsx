@@ -8,6 +8,7 @@ interface AuthContextProps {
   user: User;
   authToken: string;
   saveAuthToken: (token: string) => void;
+  setUser: (user: User) => void;
   isLoading: boolean;
 }
 
@@ -43,30 +44,6 @@ export const AuthContextProvider = ({ children }: any) => {
       setAuthToken(storedToken);
     }
   };
-
-  const initUser = async () => {
-    try {
-      setIsLoading(true);
-      if (authToken) {
-        // const response = await getUserProfile();
-        // setUser(response);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      if (error instanceof CustomError) throw error;
-      else
-        throw new CustomError({
-          message: 'Se ha producido un error al inicializar los datos del usuario',
-        });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    initUser();
-  }, [authToken]);
 
   useEffect(() => {
     initAuthToken();

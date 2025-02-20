@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 
 import { useAuthContext } from './auth.context';
 
@@ -20,6 +20,7 @@ import {
   SubmitResultResponse 
 } from '@/types/session';
 import { Difficulty } from '@/enums/difficulty.enum';
+import { SubscriptionStatus } from '@/types/subscription';
 
 interface ApiContextType {
   getUserProfile: () => Promise<User>;
@@ -34,6 +35,9 @@ interface ApiContextType {
   getListSession: (listId: string) => Promise<GetListSessionResponse>;
   evaluateAnswer: (sessionId: string, unitId: string, audioFile: FormData) => Promise<EvaluateAnswerResponse>;
   submitResult: (sessionId: string, unitId: string, score: number, answer: string) => Promise<SubmitResultResponse>;
+  activateSubscription: () => Promise<{ success: boolean }>;
+  getSubscriptionStatus: () => Promise<SubscriptionStatus>;
+  cancelSubscription: () => Promise<{ success: boolean }>;
 }
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -48,7 +52,18 @@ type ExecuteRequestOptions = {
 } & RequestInit;
 
 export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
-  const { authToken, saveAuthToken } = useAuthContext();
+  const { authToken, saveAuthToken, setUser } = useAuthContext();
+
+  const initUser = async () => {
+    const user = await getUserProfile();
+    setUser(user);
+  }
+
+  useEffect(() => {
+    if (authToken) {
+      initUser();
+    }
+  }, [authToken])
 
   const executeRequest = async ({ path, refresh = true, ...options }: ExecuteRequestOptions) => {
     try {
@@ -185,6 +200,27 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const activateSubscription = async (): Promise<{ success: boolean }> => {
+    return executeRequest({
+      path: '/subscriptions/activate',
+      method: 'POST',
+    });
+  };
+
+  const getSubscriptionStatus = async (): Promise<SubscriptionStatus> => {
+    return executeRequest({
+      path: '/subscriptions/status',
+      method: 'GET',
+    });
+  };
+
+  const cancelSubscription = async (): Promise<{ success: boolean }> => {
+    return executeRequest({
+      path: '/subscriptions/cancel',
+      method: 'POST',
+    });
+  };
+
   const value = {
     getUserProfile,
     getExplore,
@@ -198,6 +234,9 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     getListSession,
     evaluateAnswer,
     submitResult,
+    activateSubscription,
+    getSubscriptionStatus,
+    cancelSubscription,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

@@ -11,7 +11,6 @@ El modelo de base de datos de Fluento está diseñado para gestionar usuarios, l
 | id         | String   | Identificador único del usuario                  |
 | email      | String   | Correo electrónico del usuario (único)          |
 | name       | String   | Nombre del usuario                                |
-| isPremium  | Boolean  | Indica si el usuario tiene una suscripción Premium |
 | createdAt  | DateTime | Fecha de creación de la cuenta                   |
 | updatedAt  | DateTime | Fecha de la última actualización de la cuenta    |
 

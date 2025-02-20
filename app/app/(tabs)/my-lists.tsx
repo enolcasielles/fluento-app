@@ -9,15 +9,7 @@ import { MyList } from '@/types/my-lists';
 import { useFetch } from '@/hooks/useFetch';
 import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 import Svg, { Path } from 'react-native-svg';
-
-const PlusIcon = () => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <Path
-      d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-      fill={colors.primary}
-    />
-  </Svg>
-);
+import { CreateListButton } from '@/components/sections/lists/CreateListButton';
 
 const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   <View style={styles.emptyContainer}>
@@ -68,12 +60,7 @@ export default function MyLists() {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Mis Listas</Text>
           <View style={styles.createButton}>
-            <Button
-              variant="icon"
-              icon={<PlusIcon />}
-              label=""
-              onPress={() => router.push('/lists/create')}
-            />
+            <CreateListButton onCreateList={handleCreateList} />
           </View>
         </View>
         <Text style={styles.description}>

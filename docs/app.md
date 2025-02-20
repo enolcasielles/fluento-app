@@ -150,7 +150,7 @@ Se debe implementar un mecanismo que nos permita fácilmente gestionar los error
 Las pantallas Explora, Mis Listas Guardadas y Mis Listas tendrán una navegación en pestañas inferiores, Explora a la izquierda, Mis Listas Guardadas en el centro y Mis Listas a la derecha.
 
 ### Usuario Free vs Usuario Premium
-La aplicación debe funcionar con 2 tipos de usuarios: Free y Premium. La principal diferencia entre ambos es que los usuarios Free no pueden crear listas propias, solo podrán practicar con las listas del Explora. La App cuando arranque y tenga un token de usuario válido, debe hacer una llamada al endpoint “Get User”, que nos devolverá información sobre el usuario, que contendrá un campo `isPremium` que indicará si el usuario es Free o Premium.
+La aplicación debe funcionar con 2 tipos de usuarios: Free y Premium. La principal diferencia entre ambos es que los usuarios Free no pueden crear listas propias, solo podrán practicar con las listas del Explora. La App al arrancar y haber inicializado un usuario loggeado, deberá realizar una llamada al endpoint que devuelve la suscripción del usuario: "Get Suscription Status". La respuesta de esta llamada nos indicará si el usuario es Free o Premium.
 
 Cuando el usuario intente crear una nueva lista, si es Free, le mostraremos un modal indicando que necesita ser Premium para poder crear listas propias. Este modal contendrá todas las ventajas de ser Premium y un botón para que el usuario se suscriba. La suscripción la manejaremos con el servicio nativo de iOS y Android (App Store o Google Play).
 
