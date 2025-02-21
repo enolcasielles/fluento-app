@@ -18,6 +18,7 @@ export const PremiumFeatureModal: React.FC<PremiumFeatureModalProps> = ({
   onClose,
   feature,
 }) => {
+  console.log('isVisible', isVisible);
   const router = useRouter();
 
   const handleUpgrade = () => {

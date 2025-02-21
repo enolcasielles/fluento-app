@@ -15,10 +15,16 @@ export async function createListService(
 ): Promise<CreateListResponse> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, isPremium: true },
+    include: {
+      subscriptions: true,
+    },
   });
 
-  if (!user.isPremium) {
+  const isPremium = user.subscriptions.some(
+    (subscription) => subscription.status === "active",
+  );
+
+  if (!isPremium) {
     throw new CustomError({
       message: "Necesitas ser usuario Premium para crear listas",
       type: "NEED_PREMIUM",

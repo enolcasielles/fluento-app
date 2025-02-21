@@ -37,6 +37,7 @@ export const loginService = async (email: string, password: string): Promise<{ a
     if (error instanceof CustomError) {
       throw error;
     } else {
+      console.log('error', error);
       throw new CustomError({
         message: 'Error inesperado durante el login',
       });

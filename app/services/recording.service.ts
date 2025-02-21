@@ -1,4 +1,4 @@
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
+import { Audio } from 'expo-av';
 
 let recording: Audio.Recording | null = null;
 
@@ -38,6 +38,7 @@ export const stopRecording = async (): Promise<string> => {
     });
 
     recording = null;
+    //TODO(enol): cleanup recording resource
     return uri || '';
   } catch (err) {
     console.error('Failed to stop recording', err);

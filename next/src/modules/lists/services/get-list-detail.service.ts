@@ -16,7 +16,11 @@ export async function getListDetailService(
       id: listId,
     },
     include: {
-      creator: true,
+      creator: {
+        include: {
+          subscriptions: true,
+        },
+      },
     },
   });
 
@@ -34,7 +38,11 @@ export async function getListDetailService(
     });
   }
 
-  if (!list.isPublic && !list.creator?.isPremium) {
+  const isPremium = list.creator.subscriptions.some(
+    (subscription) => subscription.status === "active",
+  );
+
+  if (!list.isPublic && !isPremium) {
     throw new CustomError({
       message: "Necesitas una cuenta premium para ver esta lista",
       type: "NEED_PREMIUM",

@@ -14,6 +14,7 @@ import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { ScreenContainer } from '@/components/layouts/ScreenContainer';
+import { delay } from '@/utils/delay';
 
 type PracticeState = 'INITING' | 'QUESTION' | 'LISTENING' | 'ANSWER' | 'WAITING_EVALUATION' | 'RESULT' | 'MANUAL_EVALUATION';
 
@@ -77,12 +78,21 @@ export default function PracticeScreen() {
     setPracticeState(state);
   };
 
+  const setupAudio = async () => {
+    //TODO(enol): tricky para que el audio/escucha arranque correctamente
+    await recordingService.startRecording();
+    await delay(100);
+    await recordingService.stopRecording();
+    await delay(100);
+  }
+
   const loadSession = async () => {
     try {
       const session = await getListSession(listId as string);
       setSessionId(session.sessionId);
       setCurrentUnit(session.nextUnit);
       setEvaluationMode(session.evaluationMode);
+      await setupAudio();
       updateState('QUESTION');
     } catch (error) {
       console.error('Error loading session:', error);
@@ -110,10 +120,8 @@ export default function PracticeScreen() {
     if (!currentUnit) return;
     try {
       // Solo iniciamos grabación en modo auto
-      if (evaluationMode === 'auto') {
-        await playStartRecordingSound();
-        await recordingService.startRecording();
-      }
+      await playStartRecordingSound();
+      await recordingService.startRecording();
       
       if (!isMounted.current) return;
       timerRef.current = setTimeout(async () => {
@@ -153,6 +161,7 @@ export default function PracticeScreen() {
         }
 
         else {
+          await recordingService.stopRecording();
           if (!isMounted.current) return;
           await playStopRecordingSound();
         }

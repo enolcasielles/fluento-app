@@ -107,6 +107,7 @@ export async function processListService(
         data: {
           creationStatus: CreationStatus.COMPLETED,
           description,
+          totalUnits: unitsToCreate.length,
         },
       });
 

@@ -39,7 +39,6 @@ export const registerService = async (
       name: name,
       role: Role.USER,
       sub: data.user.id,
-      isPremium: false,
     },
   });
   return successResponse();

@@ -9,7 +9,19 @@ import { MyList } from '@/types/my-lists';
 import { useFetch } from '@/hooks/useFetch';
 import { ScreenContainer } from '@/components/layouts/ScreenContainer';
 import Svg, { Path } from 'react-native-svg';
-import { CreateListButton } from '@/components/sections/lists/CreateListButton';
+import { usePremiumFeature } from '@/hooks/usePremiumFeature';
+import { PremiumFeatureModal } from '@/components/base/PremiumFeatureModal';
+
+
+
+const PlusIcon = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+      fill={colors.primary}
+    />
+  </Svg>
+);
 
 const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   <View style={styles.emptyContainer}>
@@ -26,11 +38,23 @@ const EmptyState = ({ onCreateList }: { onCreateList: () => void }) => (
   </View>
 );
 
+
 export default function MyLists() {
   const router = useRouter();
   const { getMyLists } = useApiContext();
   const [lists, setLists] = useState<MyList[]>([]);
-  
+
+  const {
+    showPremiumModal,
+    hidePremiumModal,
+    handleFeatureAccess,
+    feature,
+  } = usePremiumFeature({
+    key: 'create_list',
+    title: 'Crear Lista Personalizada',
+    description: 'Actualiza a Premium para crear listas personalizadas ilimitadas y generar el contenido que más te interese.',
+  });
+
   const { isLoading } = useFetch({
     action: async () => {
       const data = await getMyLists();
@@ -39,7 +63,9 @@ export default function MyLists() {
   });
 
   const handleCreateList = () => {
-    router.push('/lists/create');
+    handleFeatureAccess(() => {
+      router.push('/lists/create');
+    })
   };
 
   if (isLoading) {
@@ -50,17 +76,24 @@ export default function MyLists() {
     );
   }
 
+  let comp = null;
+
   if (lists.length === 0) {
-    return <EmptyState onCreateList={handleCreateList} />;
+    comp = <EmptyState onCreateList={handleCreateList} />;
   }
 
-  return (
+  else comp = (
     <ScreenContainer>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Mis Listas</Text>
           <View style={styles.createButton}>
-            <CreateListButton onCreateList={handleCreateList} />
+            <Button
+              variant="icon"
+              icon={<PlusIcon />}
+              label=""
+              onPress={handleCreateList}
+            />
           </View>
         </View>
         <Text style={styles.description}>
@@ -86,6 +119,15 @@ export default function MyLists() {
       />
     </ScreenContainer>
   );
+
+  return <>
+    {comp}
+    <PremiumFeatureModal
+      isVisible={showPremiumModal}
+      onClose={hidePremiumModal}
+      feature={feature}
+    />
+  </>
 }
 
 const styles = StyleSheet.create({

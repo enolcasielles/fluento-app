@@ -4,6 +4,7 @@ import { Button } from '@/components/base/Button';
 import { useRouter } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -36,6 +37,17 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="saved-lists"
+        options={{
+          title: 'Guardadas',
+          tabBarLabel: 'Guardadas',
+          headerTitle: 'Listas Guardadas',
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="hearto" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="my-lists"
         options={{
           title: 'Mis Listas',
@@ -55,13 +67,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="saved-lists"
+        name="profile"
         options={{
-          title: 'Guardadas',
-          tabBarLabel: 'Guardadas',
-          headerTitle: 'Listas Guardadas',
+          title: 'Perfil',
+          tabBarLabel: 'Perfil',
+          headerTitle: 'Perfil',
           tabBarIcon: ({ color, size }) => (
-            <AntDesign name="hearto" size={size} color={color} />
+            <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
       />

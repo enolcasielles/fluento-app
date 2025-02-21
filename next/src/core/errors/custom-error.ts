@@ -26,6 +26,7 @@ export class CustomError {
   toJSON(): ICustomError {
     return {
       message: this.message,
+      type: this.type,
       statusCode: this.statusCode,
     };
   }

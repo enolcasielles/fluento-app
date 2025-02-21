@@ -12,6 +12,7 @@ import Svg, { Path } from 'react-native-svg';
 import { BUTTON_HEIGHT } from '@/components/base/Button';
 import { useFetch } from '@/hooks/useFetch';
 import { ScreenContainer } from '@/components/layouts/ScreenContainer';
+import { roundToTwoDecimals } from '@/utils/numbers';
 
 const FOOTER_HEIGHT = spacing.lg + BUTTON_HEIGHT + spacing.lg
 
@@ -179,7 +180,7 @@ export default function ListDetailScreen() {
                   />
                   <ResultItem 
                     label="Puntuación Media" 
-                    value={list.userProgress.averageScore.toString()} 
+                    value={roundToTwoDecimals(list.userProgress.averageScore).toString()} 
                   />
                 </View>
               </View>

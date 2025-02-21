@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '../../theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text' | 'icon';
+type ButtonVariant = 'primary' | 'secondary'| 'danger' | 'outline' | 'text' | 'icon';
 
 export const BUTTON_HEIGHT = 48;
 
@@ -13,6 +13,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   icon?: React.ReactNode;
+  style?: ViewStyle;
+  textColor?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -21,7 +23,9 @@ export const Button: React.FC<ButtonProps> = ({
   onPress,
   disabled = false,
   loading = false,
-  icon
+  icon,
+  style,
+  textColor
 }) => {
   const getBackgroundColor = () => {
     if (disabled) return colors.disabled;
@@ -30,6 +34,8 @@ export const Button: React.FC<ButtonProps> = ({
         return colors.primary;
       case 'secondary':
         return colors.secondary;
+      case 'danger':
+        return colors.error;
       case 'outline':
       case 'text':
         return 'transparent';
@@ -45,6 +51,7 @@ export const Button: React.FC<ButtonProps> = ({
     switch (variant) {
       case 'primary':
       case 'secondary':
+      case 'danger':
         return colors.background;
       case 'outline':
       case 'text':
@@ -73,7 +80,8 @@ export const Button: React.FC<ButtonProps> = ({
           borderColor: getBorderColor(),
         },
         variant === 'outline' && styles.outlineButton,
-        disabled && styles.disabled
+        disabled && styles.disabled,
+        style
       ]}
       onPress={onPress}
       disabled={disabled || loading}
@@ -84,7 +92,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <View style={styles.content}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
-          {variant !== 'icon' && <Text style={[styles.label, { color: getTextColor() }]}>{label}</Text>}
+          {variant !== 'icon' && <Text style={[styles.label, { color: textColor || getTextColor() }]}>{label}</Text>}
         </View>
       )}
     </TouchableOpacity>

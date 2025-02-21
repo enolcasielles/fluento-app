@@ -9,6 +9,9 @@ export async function getListSessionService(
 ): Promise<GetListSessionResponse> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: {
+      subscriptions: true,
+    },
   });
 
   if (!user) {
@@ -28,6 +31,10 @@ export async function getListSessionService(
       statusCode: 404,
     });
   }
+
+  const isPremium = user.subscriptions.some(
+    (subscription) => subscription.status === "active",
+  );
 
   if (!list.isPublic && list.creatorId !== userId) {
     throw new CustomError({
@@ -59,8 +66,7 @@ export async function getListSessionService(
     sessionId: session.id,
     listId: list.id,
     listName: list.name,
-    //evaluationMode: user.isPremium ? "auto" : "manual",
-    evaluationMode: "manual",
+    evaluationMode: isPremium ? "auto" : "manual",
     nextUnit: {
       id: nextUnit.id,
       answer: {

@@ -1,12 +1,20 @@
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { useRouter } from 'expo-router';
 import { useError } from '@/contexts/error.context';
 import { colors, spacing, typography, borderRadius, dimensions } from '../../theme';
 
 export function ErrorModal() {
+  const router = useRouter();
   const { error, action, hideError } = useError();
 
   if (!error) return null;
+
+  console.log('error', error);
+
+  const handleGoPremium = () => {
+    hideError();
+    router.push('/subscription');
+  };
 
   return (
     <Modal 
@@ -21,6 +29,14 @@ export function ErrorModal() {
           <Text style={styles.message}>{error.message}</Text>
           
           <View style={styles.actions}>
+            {error.type === 'NEED_PREMIUM' && (
+              <TouchableOpacity
+                onPress={handleGoPremium}
+                style={[styles.button, styles.primaryButton]}
+              >
+                <Text style={styles.primaryButtonText}>Ver Premium</Text>
+              </TouchableOpacity>
+            )}
             {action && (
               <TouchableOpacity
                 onPress={() => {
@@ -33,10 +49,17 @@ export function ErrorModal() {
               </TouchableOpacity>
             )}
             <TouchableOpacity 
-              onPress={hideError} 
-              style={[styles.button, styles.secondaryButton]}
+              onPress={() => {
+                if (error.type === 'NEED_PREMIUM') {
+                  router.back();
+                }
+                hideError();
+              }} 
+              style={[styles.button, error.type === 'NEED_PREMIUM' ? styles.outlineButton : styles.secondaryButton]}
             >
-              <Text style={styles.secondaryButtonText}>Cerrar</Text>
+              <Text style={error.type === 'NEED_PREMIUM' ? styles.outlineButtonText : styles.secondaryButtonText}>
+                Cerrar
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -89,6 +112,11 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: colors.error,
   },
+  outlineButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   primaryButtonText: {
     color: colors.background,
     fontSize: typography.body.fontSize,
@@ -97,6 +125,12 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: colors.background,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.medium,
+    textAlign: 'center',
+  },
+  outlineButtonText: {
+    color: colors.textSecondary,
     fontSize: typography.body.fontSize,
     fontWeight: typography.medium,
     textAlign: 'center',

@@ -9,7 +9,6 @@ export async function getUserService(userId: string): Promise<GetUserResponse> {
       id: true,
       name: true,
       email: true,
-      isPremium: true,
     },
   });
 
@@ -24,6 +23,5 @@ export async function getUserService(userId: string): Promise<GetUserResponse> {
     id: user.id,
     name: user.name,
     email: user.email,
-    isPremium: user.isPremium,
   };
 }

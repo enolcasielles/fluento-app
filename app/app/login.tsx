@@ -37,7 +37,7 @@ export default function Login() {
 
   const { values, errors, isValid, handleChange, handleSubmit } = useForm<LoginForm>({
     initialValues: {
-      email: 'enolcasielles+1@gmail.com',
+      email: 'enolcasielles+3@gmail.com',
       password: 'Enol123456$',
     },
     schema: loginSchema,

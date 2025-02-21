@@ -1,4 +1,4 @@
-import { ApiError } from '@/types/ApiError';
+import { ApiError } from "@/types/api-error";
 
 export interface ICustomError {
   type?: string;

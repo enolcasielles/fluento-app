@@ -10,6 +10,7 @@ interface AuthContextProps {
   saveAuthToken: (token: string) => void;
   setUser: (user: User) => void;
   isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AUTH_TOKEN_KEY = '@auth_token';
@@ -38,6 +39,17 @@ export const AuthContextProvider = ({ children }: any) => {
     }
   };
 
+  const signOut = async () => {
+    try {
+      await saveAuthToken(null);
+      setUser(null);
+    } catch (error) {
+      throw new CustomError({
+        message: 'Error al cerrar sesión',
+      });
+    }
+  };
+
   const initAuthToken = async () => {
     const storedToken = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
     if (storedToken) {
@@ -55,6 +67,7 @@ export const AuthContextProvider = ({ children }: any) => {
     authToken,
     saveAuthToken,
     isLoading,
+    signOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
