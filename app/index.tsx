@@ -1,48 +1,46 @@
-import { View } from 'react-native';
-import { Button } from '../components/base/Button';
-import { useRouter } from 'expo-router';
-import { colors, spacing } from '../theme';
-import * as speechService from '../services/speech.service';
+import React from 'react';
+import { OnboardingSlider } from '@/components/base/OnboardingSlider';
+import { OnboardingSlide } from '@/types/onboarding';
+import { router } from 'expo-router';
+import { ScreenContainer } from '@/components/layouts/ScreenContainer';
+import { SafeAreaView } from 'react-native';
 
-export default function Home() {
-  const router = useRouter();
+const slides: OnboardingSlide[] = [
+  {
+    id: '1',
+    title: 'Aprende inglés de forma natural',
+    description: 'Practica con frases reales y mejora tu fluidez hablando inglés como un nativo',
+    image: {
+      source: require('@/assets/images/onboarding/slide-1.png'),
+      type: 'image'
+    },
+  },
+  {
+    id: '2',
+    title: 'Practica cuando quieras',
+    description: 'Dedica unos minutos al día para mejorar tu inglés, sin presiones ni horarios',
+    image: {
+      source: require('@/assets/images/onboarding/slide-2.png'),
+      type: 'image'
+    },
+  },
+  {
+    id: '3',
+    title: 'Mejora constantemente',
+    description: 'La app se adapta a tu nivel y te ayuda a reforzar las frases que más te cuestan',
+    image: {
+      source: require('@/assets/images/onboarding/slide-3.png'),
+      type: 'image'
+    },
+  },
+];
 
-  const playText = async (text: string, language: string) => {
-    try {
-      await speechService.speak(text, { language });
-    } catch (error) {
-      console.error('Error playing text:', error);
-    }
+export default function OnboardingScreen() {
+  const handleFinish = () => {
+    router.replace('/register');
   };
 
-  return (
-    <View style={{ 
-      flex: 1, 
-      justifyContent: 'center', 
-      alignItems: 'center',
-      backgroundColor: colors.background,
-      gap: spacing.md,
-    }}>
-      <Button
-        label="Ver Design System"
-        onPress={() => router.push('/design-system')}
-      />
-      <Button
-        label="Iniciar Sesión"
-        onPress={() => router.push('/login')}
-      />
-      <Button
-        label="Go Practice"
-        onPress={() => router.push('/practice/61d0117e-03fa-471b-bb2f-ef71bac474f0')}
-      />
-      <Button
-        label="Test Page"
-        onPress={() => router.push('/test')}
-      />
-      <Button
-        label="Onboarding"
-        onPress={() => router.push('/onboarding')}
-      />
-    </View>
-  );
-}
+  return <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <OnboardingSlider slides={slides} onFinish={handleFinish} />;
+  </SafeAreaView>
+} 
